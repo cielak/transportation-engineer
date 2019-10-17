@@ -2,6 +2,10 @@ import typing as t
 from math import ceil
 
 
+class SignallingGroup:
+    name = str
+
+
 class CollisionElement:
     @property
     def evacuation_time(self) -> float:
@@ -80,3 +84,14 @@ def required_intergreen_times(collision_pairs: t.Iterable[CollisionPair]):
             if (x.evacuating is evacuating and x.arriving is arriving)
         ]
         yield IntergreenPair(evacuating, arriving, max(pair_intergreen_times))
+
+
+def intergreen_times(signalling_groups):
+    for group in signalling_groups:
+        for other_group in signalling_groups:
+            if other_group == group:
+                continue
+            for stream_from_other_group in other_group.streams:
+                for stream in group.streams:
+                    if stream.intersects(stream_from_other_group):
+                        yield intergreen_time(group, other_group)
