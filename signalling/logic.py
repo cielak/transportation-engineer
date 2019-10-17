@@ -68,3 +68,15 @@ def all_intergreen_pairs(
                     arriving.arrival_time,
                 ),
             )
+
+
+def required_intergreen_times(collision_pairs: t.Iterable[CollisionPair]):
+    intergreens = all_intergreen_pairs(collision_pairs)
+    keys = set((x.evacuating, x.arriving) for x in intergreens)
+    for evacuating, arriving in keys:
+        pair_intergreen_times = [
+            x.intergreen_time
+            for x in intergreens
+            if (x.evacuating is evacuating and x.arriving is arriving)
+        ]
+        yield IntergreenPair(evacuating, arriving, max(pair_intergreen_times))
