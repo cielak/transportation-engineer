@@ -4,28 +4,34 @@ from math import ceil
 
 class CollisionElement:
     @property
-    def evacuation_time(self):
+    def evacuation_time(self) -> float:
         raise NotImplementedError
 
     @property
-    def arrival_time(self):
+    def arrival_time(self) -> float:
         raise NotImplementedError
 
     @property
-    def evacuation_yellow_time(self):
+    def evacuation_yellow_time(self) -> int:
         raise NotImplementedError
 
 
-class CollisionPair(ReversiblePair):
+class IntergreenElement:
+    pass
+
+
+class CollisionPair:
     a = CollisionElement
     b = CollisionElement
 
     @property
-    def elements(self):
+    def elements(self) -> t.Tuple[t.Type[CollisionElement], t.Type[CollisionElement]]:
         return self.a, self.b
 
     @property
-    def inverted_elements(self):
+    def inverted_elements(
+        self
+    ) -> t.Tuple[t.Type[CollisionElement], t.Type[CollisionElement]]:
         return self.b, self.a
 
 
@@ -58,7 +64,7 @@ def all_intergreen_pairs(
                 arriving,
                 intergreen_time(
                     evacuating.evacuation_yellow_time,
-                    evacuating.time_evacuation,
-                    arriving.time_arrival,
+                    evacuating.evacuation_time,
+                    arriving.arrival_time,
                 ),
             )
