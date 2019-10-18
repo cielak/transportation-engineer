@@ -55,43 +55,29 @@ def intergreen_time(
     return ceil(intergreen_time) if intergreen_time > 0 else 0
 
 
-def all_intergreen_pairs(
-    collision_pairs: t.Iterable[CollisionPair]
-) -> t.Iterable[IntergreenPair]:
-    for collision_pair in collision_pairs:
-        for evacuating, arriving in [
-            collision_pair.elements,
-            collision_pair.inverted_elements,
-        ]:
-            yield IntergreenPair(
-                evacuating,
-                arriving,
-                intergreen_time(
-                    evacuating.evacuation_yellow_time,
-                    evacuating.evacuation_time,
-                    arriving.arrival_time,
-                ),
-            )
+def stream_intergreen_time(evacuating_stream, arriving_stream):
+    collision_point = CollisionPoint(evacuating_stream, arriving_stream)
+    return intergree_time(
+        evacuating_stream.evacuating_yellow_time,
+        collision_point.evacuating_time,
+        collision_point.arriving_time,
+    )
 
 
-def required_intergreen_times(collision_pairs: t.Iterable[CollisionPair]):
-    intergreens = all_intergreen_pairs(collision_pairs)
-    keys = set((x.evacuating, x.arriving) for x in intergreens)
-    for evacuating, arriving in keys:
-        pair_intergreen_times = [
-            x.intergreen_time
-            for x in intergreens
-            if (x.evacuating is evacuating and x.arriving is arriving)
-        ]
-        yield IntergreenPair(evacuating, arriving, max(pair_intergreen_times))
+def group_intergreen_time(evacuating_group, arriving_group):
+    if evacuating_group == arriving_group:
+        return None
+    else:
+        stream_intergreen_times = []
+        for evacuating_stream in evacuating_group.streams:
+            for arriving_stream in arriving_group.streams:
+                stream_intergreen_times.append(
+                    stream_intergreen_time(evacuating_stream, arriving_stream)
+                )
+        return max(stream_intergreen_times)
 
 
 def intergreen_times(signalling_groups):
     for group in signalling_groups:
         for other_group in signalling_groups:
-            if other_group == group:
-                continue
-            for stream_from_other_group in other_group.streams:
-                for stream in group.streams:
-                    if stream.intersects(stream_from_other_group):
-                        yield intergreen_time(group, other_group)
+            yield group_intergreen_time(group, other_group)
