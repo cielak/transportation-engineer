@@ -56,7 +56,9 @@ def intergreen_time(
 
 
 def stream_intergreen_time(evacuating_stream, arriving_stream):
-    collision_point = CollisionPoint(evacuating_stream, arriving_stream)
+    collision_point = evacuating_stream.intercests(arriving_stream)
+    if not collision_point:
+        return None
     return intergree_time(
         evacuating_stream.evacuating_yellow_time,
         collision_point.evacuating_time,
@@ -80,4 +82,15 @@ def group_intergreen_time(evacuating_group, arriving_group):
 def intergreen_times(signalling_groups):
     for group in signalling_groups:
         for other_group in signalling_groups:
-            yield group_intergreen_time(group, other_group)
+            yield IntergreenPair(
+                group, other_group, group_intergreen_time(group, other_group)
+            )
+
+
+def interphase_min_time(in_phase, out_phase):
+    evacuating_groups = intersection(in_phase.green_groups, out_phase.red_groups)
+    arriving_groups = intersection(in_phase.red_groupa, out_phase.green_groups)
+    return max(
+        group_intergreen_time(evacuating, incoming)
+        for (evacuating, arriving) in permutation(evacuating_groups, arriving_groups)
+    )
