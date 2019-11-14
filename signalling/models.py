@@ -9,11 +9,11 @@ class StreamIntersection(t.NamedTuple):
 
 
 class TrafficStream(t.NamedTuple):
+    stream_id: str
     evacuation_velocity: int
     arrival_velocity: int
     evacuating_yellow_time: int
     vehicle_length: int
-    stream_intersections: t.Set[StreamIntersection]
 
 
 class CollisionPoint(t.NamedTuple):
