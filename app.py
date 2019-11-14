@@ -9,21 +9,26 @@ app = dash.Dash(__name__)
 server = app.server
 
 app.title = "Transportation Engineer"
-app.layout = html.Div([
-    html.H2('Hello World'),
-    dcc.Dropdown(
-        id='dropdown',
-        options=[{'label': i, 'value': i} for i in ['signalling']],
-        value='signalling'
-    ),
-    html.Div(id='display-value')
-])
+app.layout = html.Div(
+    [
+        html.H2("Hello World"),
+        dcc.Dropdown(
+            id="dropdown",
+            options=[{"label": i, "value": i} for i in ["signalling"]],
+            value="signalling",
+        ),
+        html.Div(id="display-value"),
+    ]
+)
 
-@app.callback(dash.dependencies.Output('display-value', 'children'),
-              [dash.dependencies.Input('dropdown', 'value')])
+
+@app.callback(
+    dash.dependencies.Output("display-value", "children"),
+    [dash.dependencies.Input("dropdown", "value")],
+)
 def display_value(value):
     return 'You have selected "{}"'.format(value)
 
-if __name__ == '__main__':
-    app.run_server(debug=True, port=8888)
 
+if __name__ == "__main__":
+    app.run_server(debug=True, port=8888)
