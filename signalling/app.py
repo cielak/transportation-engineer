@@ -2,6 +2,8 @@ import dash
 import dash_table as dt
 import dash_html_components as html
 
+from models import SignallingGroup, TrafficStream
+
 app = dash.Dash(__name__)
 
 server = app.server
@@ -12,7 +14,7 @@ app.layout = html.Div(
         html.H2("Signalling"),
         dt.DataTable(
             id="groups_table",
-            columns=[{"name": x, "id": x} for x in ["group_name"]],
+            columns=[{"name": x, "id": x} for x in SignallingGroup._fields],
             data=[],
             editable=True,
             row_deletable=True,
@@ -20,10 +22,7 @@ app.layout = html.Div(
         html.Button("Add group", id="add_group_button", n_clicks=0),
         dt.DataTable(
             id="streams_table",
-            columns=[
-                {"name": x, "id": x}
-                for x in ["stream_name", "stream_group", "stream_yellow_time"]
-            ],
+            columns=[{"name": x, "id": x} for x in TrafficStream._fields],
             data=[],
             editable=True,
             row_deletable=True,
