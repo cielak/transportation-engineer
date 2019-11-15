@@ -25,7 +25,10 @@ app.layout = html.Div(
         html.Button("Add group", id="add_group_button", n_clicks=0),
         dt.DataTable(
             id="groups_table",
-            columns=[{"name": x, "id": x, 'presentation': 'dropdown'} for x in SignallingGroup._fields],
+            columns=[
+                {"name": x, "id": x, "presentation": "dropdown"}
+                for x in SignallingGroup._fields
+            ],
             data=[],
             editable=True,
             row_deletable=True,
@@ -65,12 +68,10 @@ def add_group(n_clicks, rows, columns):
 @app.callback(
     dash.dependencies.Output("groups_table", "dropdown"),
     [dash.dependencies.Input("streams_table", "data_timestamp")],
-    [
-        dash.dependencies.State("groups_table", "data"),
-    ],
+    [dash.dependencies.State("groups_table", "data")],
 )
 def get_available_streams(timestamp, rows):
-    vals = [x['stream_id'] for x in rows]
+    vals = [x["stream_id"] for x in rows]
     dropdown_streams = {
         "streams": {"options": [{"label": i, "value": i} for i in vals]}
     }
