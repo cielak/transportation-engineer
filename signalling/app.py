@@ -21,6 +21,18 @@ app.layout = html.Div(
             editable=True,
             row_deletable=True,
         ),
+        html.H2("Collision points"),
+        html.Button("Add collision point"),
+        dt.DataTable(
+            id="collision_points_table",
+            columns=[
+                {"name": x, "id": x, "presentation": "dropdown"}
+                for x in CollisionPoint._fields
+            ],
+            data=[],
+            editable=True,
+            row_deletable=True,
+        ),
         html.H2("Signalling groups"),
         html.Button("Add group", id="add_group_button", n_clicks=0),
         dt.DataTable(
@@ -52,6 +64,31 @@ def add_stream(n_clicks, rows, columns):
 
 
 @app.callback(
+    dash.dependencies.Output("collision_points_table", "data"),
+    [dash.dependencies.Input("add_collision_point_button", "n_clicks")],
+    [
+        dash.dependencies.State("collision_points_table", "data"),
+        dash.dependencies.State("collision_points_table", "columns"),
+    ],
+)
+def add_collision_point(n_clicks, rows, columns):
+    if n_clicks > 0:
+        rows.append({c["id"]: "" for c in columns})
+    return rows
+
+
+@app.callback(
+    dash.dependencies.Output("collision_points_table", "dropdown"),
+    [dash.dependencies.Input("streams_table", "data_timestamp")],
+    [dash.dependencies.State("streams_table", "data")]
+)
+def set_available_streams_for_collision_points(timestamp, rows):
+    vals = [x["stream_id"] for x in rows]
+    dropdown = {"streams": {"options": [{"label": i, "value": i} for i in vals]}}
+    return dropdown
+
+
+@app.callback(
     dash.dependencies.Output("groups_table", "data"),
     [dash.dependencies.Input("add_group_button", "n_clicks")],
     [
@@ -70,7 +107,7 @@ def add_group(n_clicks, rows, columns):
     [dash.dependencies.Input("streams_table", "data_timestamp")],
     [dash.dependencies.State("streams_table", "data")],
 )
-def get_available_streams(timestamp, rows):
+def set_available_streams_for_groups(timestamp, rows):
     vals = [x["stream_id"] for x in rows]
     dropdown = {"streams": {"options": [{"label": i, "value": i} for i in vals]}}
     return dropdown
