@@ -2,7 +2,7 @@ import dash
 import dash_table as dt
 import dash_html_components as html
 
-from signalling.models import SignallingGroup, TrafficStream
+from models import SignallingGroup, TrafficStream
 
 app = dash.Dash(__name__)
 
@@ -68,14 +68,12 @@ def add_group(n_clicks, rows, columns):
 @app.callback(
     dash.dependencies.Output("groups_table", "dropdown"),
     [dash.dependencies.Input("streams_table", "data_timestamp")],
-    [dash.dependencies.State("groups_table", "data")],
+    [dash.dependencies.State("streams_table", "data")],
 )
 def get_available_streams(timestamp, rows):
     vals = [x["stream_id"] for x in rows]
-    dropdown_streams = {
-        "streams": {"options": [{"label": i, "value": i} for i in vals]}
-    }
-    return dropdown_streams
+    dropdown = {"streams": {"options": [{"label": i, "value": i} for i in vals]}}
+    return dropdown
 
 
 if __name__ == "__main__":
