@@ -47,6 +47,9 @@ app.layout = html.Div(
             row_deletable=True,
         ),
         html.H2("Streams Collisions"),
+        html.Div(
+            "Automatically generated from traffic streams and stream intersections"
+        ),
         dt.DataTable(
             id="stream_intersections_matrix",
             columns=[
@@ -113,8 +116,12 @@ def set_available_streams_for_stream_intersections(timestamp, rows):
         dash.dependencies.State("stream_intersections_table", "data"),
     ],
 )
-def set_stream_intersections_matrix(_1, _2, streams_data, intersections_data):
+def set_stream_intersections_data(_1, _2, streams_data, intersections_data):
     streams = set(TrafficStream(**x) for x in streams_data)
+    if not all(
+        all([cell != "" for cell in row.values()]) for row in intersections_data
+    ) or not all(all([cell != "" for cell in row.values()]) for row in streams_data):
+        return []
     updated_intersections_data = intersections_data.copy()
     for s in updated_intersections_data:
         e_id = s["evacuating_stream"]
