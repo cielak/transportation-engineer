@@ -2,7 +2,7 @@ import typing as t
 from itertools import product
 from math import ceil
 
-from signalling.models import (
+from models import (
     TrafficStream,
     CollisionPoint,
     SignallingPhase,
@@ -33,9 +33,11 @@ def arrival_time(stream_intersection: StreamIntersection) -> float:
 
 
 def intersect_traffic_streams(
-    evacuating_stream: TrafficStream, arriving_stream: TrafficStream
+    evacuating_stream: TrafficStream,
+    arriving_stream: TrafficStream,
+    stream_intersections: t.Set[StreamIntersection],
 ) -> t.Union[CollisionPoint, None]:
-    for stream_intersection in evacuating_stream.stream_intersections:
+    for stream_intersection in stream_intersections:
         if (
             stream_intersection.arriving_stream == arriving_stream
             and stream_intersection.evacuating_stream == evacuating_stream

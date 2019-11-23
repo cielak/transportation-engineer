@@ -14,7 +14,6 @@ class TrafficStream(t.NamedTuple):
     arrival_velocity: int
     evacuating_yellow_time: int
     vehicle_length: int
-    stream_intersections: t.Set[StreamIntersection]
 
 
 class CollisionPoint(t.NamedTuple):
