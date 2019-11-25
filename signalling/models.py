@@ -7,6 +7,14 @@ class StreamIntersection(t.NamedTuple):
     arriving_stream: "TrafficStream"
     arrival_distance: float
 
+    def inverted(self):
+        return StreamIntersection(
+            self.arriving_stream,
+            self.arrival_distance,
+            self.evacuating_stream,
+            self.evacuation_distance,
+        )
+
 
 class TrafficStream(t.NamedTuple):
     stream_id: str

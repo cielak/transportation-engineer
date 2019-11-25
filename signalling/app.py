@@ -133,19 +133,10 @@ def set_stream_intersections_data(_1, _2, streams_data, intersections_data):
     intersections = set(StreamIntersection(**x) for x in updated_intersections_data)
     ret = []
     for stream_a, stream_b in product(streams, streams):
-        # The following should be a part of 'intersect_traffic_streams'
-        collision_point_ab = intersect_traffic_streams(
-            stream_a, stream_b, intersections
-        )
-        collision_point_ba = intersect_traffic_streams(
-            stream_b, stream_a, intersections
-        )
-        collision_is_symetric = collision_point_ab and collision_point_ba
-        if collision_is_symetric:
-            ret.append(collision_point_ab._asdict())
-            ret.append(collision_point_ba._asdict())
-            # TODO: raise for asymetric collisions
-    return ret
+        collision_point = intersect_traffic_streams(stream_a, stream_b, intersections)
+        if collision_point:
+            ret.append(collision_point._asdict())
+    return sorted(ret, key=lambda x: (x["evacuating_stream"], x["arriving_stream"]))
 
 
 @app.callback(

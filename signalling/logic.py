@@ -33,20 +33,30 @@ def arrival_time(stream_intersection: StreamIntersection) -> float:
 
 
 def intersect_traffic_streams(
-    evacuating_stream: TrafficStream,
-    arriving_stream: TrafficStream,
+    stream_a: TrafficStream,
+    stream_b: TrafficStream,
     stream_intersections: t.Set[StreamIntersection],
 ) -> t.Union[CollisionPoint, None]:
     for stream_intersection in stream_intersections:
         if (
-            stream_intersection.arriving_stream == arriving_stream
-            and stream_intersection.evacuating_stream == evacuating_stream
+            stream_intersection.evacuating_stream == stream_a
+            and stream_intersection.arriving_stream == stream_b
         ):
             return CollisionPoint(
-                evacuating_stream=evacuating_stream,
+                evacuating_stream=stream_a,
                 evacuation_time=evacuation_time(stream_intersection),
-                arriving_stream=arriving_stream,
+                arriving_stream=stream_b,
                 arrival_time=arrival_time(stream_intersection),
+            )
+        elif (
+            stream_intersection.evacuating_stream == stream_b
+            and stream_intersection.arriving_stream == stream_a
+        ):
+            return CollisionPoint(
+                evacuating_stream=stream_b,
+                evacuation_time=evacuation_time(stream_intersection.inverted()),
+                arriving_stream=stream_a,
+                arrival_time=arrival_time(stream_intersection.inverted()),
             )
 
 
