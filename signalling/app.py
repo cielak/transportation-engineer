@@ -140,7 +140,7 @@ def set_stream_intersections_data(_1, _2, streams_data, intersections_data):
         collision_point_ba = intersect_traffic_streams(
             stream_b, stream_a, intersections
         )
-        collision_is_symeteic = collision_point_ab and collision_point_ba
+        collision_is_symetric = collision_point_ab and collision_point_ba
         if collision_is_symetric:
             ret.append(collision_point_ab._asdict())
             ret.append(collision_point_ba._asdict())
