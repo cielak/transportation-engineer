@@ -1,10 +1,18 @@
 import typing as t
 
 
+class TrafficStream(t.NamedTuple):
+    stream_id: str
+    evacuation_velocity: int
+    arrival_velocity: int
+    evacuating_yellow_time: int
+    vehicle_length: int
+
+
 class StreamIntersection(t.NamedTuple):
-    evacuating_stream: "TrafficStream"
+    evacuating_stream: TrafficStream
     evacuation_distance: float
-    arriving_stream: "TrafficStream"
+    arriving_stream: TrafficStream
     arrival_distance: float
 
     def inverted(self):
@@ -14,14 +22,6 @@ class StreamIntersection(t.NamedTuple):
             self.evacuating_stream,
             self.evacuation_distance,
         )
-
-
-class TrafficStream(t.NamedTuple):
-    stream_id: str
-    evacuation_velocity: int
-    arrival_velocity: int
-    evacuating_yellow_time: int
-    vehicle_length: int
 
 
 class CollisionPoint(t.NamedTuple):

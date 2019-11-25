@@ -131,12 +131,10 @@ def set_stream_intersections_data(_1, _2, streams_data, intersections_data):
         s["evacuating_stream"] = e_stream
         s["arriving_stream"] = a_stream
     intersections = set(StreamIntersection(**x) for x in updated_intersections_data)
-    ret = []
-    for stream_a, stream_b in product(streams, streams):
-        collision_point = intersect_traffic_streams(stream_a, stream_b, intersections)
-        if collision_point:
-            ret.append(collision_point._asdict())
-    return sorted(ret, key=lambda x: (x["evacuating_stream"], x["arriving_stream"]))
+    return sorted(
+        [pt._asdict() for pt in intersect_traffic_streams(intersections)],
+        key=lambda x: (x["evacuating_stream"], x["arriving_stream"]),
+    )
 
 
 @app.callback(
