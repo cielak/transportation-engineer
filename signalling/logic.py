@@ -2,7 +2,7 @@ import typing as t
 from itertools import product
 from math import ceil
 
-from models import (
+from signalling.models import (
     TrafficStream,
     CollisionPoint,
     SignallingPhase,

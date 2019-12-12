@@ -1,16 +1,17 @@
-from itertools import product
-
 import dash
 import dash_core_components as dcc
 import dash_table as dt
 import dash_html_components as html
 
-from models import SignallingGroup, TrafficStream, StreamIntersection, CollisionPoint
-from logic import intersect_traffic_streams
+from signalling.models import (
+    SignallingGroup,
+    TrafficStream,
+    StreamIntersection,
+    CollisionPoint,
+)
+from signalling.logic import intersect_traffic_streams
 
 app = dash.Dash(__name__)
-
-server = app.server
 
 app.title = "Transportation Engineer"
 app.layout = html.Div(
@@ -51,7 +52,7 @@ app.layout = html.Div(
             "Automatically generated from traffic streams and stream intersections"
         ),
         dt.DataTable(
-            id="stream_intersections_matrix",
+            id="stream_collisions_table",
             columns=[
                 {"name": x, "id": x, "presentation": "dropdown"}
                 for x in CollisionPoint._fields
@@ -106,7 +107,7 @@ def set_available_streams_for_stream_intersections(timestamp, rows):
 
 
 @app.callback(
-    dash.dependencies.Output("stream_intersections_matrix", "data"),
+    dash.dependencies.Output("stream_collisions_table", "data"),
     [
         dash.dependencies.Input("streams_table", "data_timestamp"),
         dash.dependencies.Input("stream_intersections_table", "data_timestamp"),
@@ -154,7 +155,7 @@ def add_group(n_clicks, groups_rows, streams_rows):
                 children=[
                     dcc.Input(id="group_id"),
                     dcc.Dropdown(
-                        id="group_streams", options=options, value=[], multi=True,
+                        id="group_streams", options=options, value=[], multi=True
                     ),
                 ]
             )
@@ -163,7 +164,3 @@ def add_group(n_clicks, groups_rows, streams_rows):
 
 
 # TODO: allow group removal
-
-
-if __name__ == "__main__":
-    app.run_server(debug=True, port=8888)
