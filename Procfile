@@ -1,1 +1,1 @@
-web: gunicorn signalling.app:server
+web: gunicorn app:server
