@@ -1,4 +1,11 @@
-from signalling.models import TrafficStream, StreamIntersection, CollisionPoint
+import typing as t
+
+from signalling.models import (
+    TrafficStream,
+    StreamIntersection,
+    CollisionPoint,
+    SignallingGroup,
+)
 
 
 def read_traffic_streams(streams_data):
@@ -25,3 +32,24 @@ def return_collision_point(collision_point: CollisionPoint) -> dict:
             "arriving_stream": collision_point.arriving_stream.stream_id,
         },
     }
+
+
+def read_collision_points(collisions_rows) -> t.Set[CollisionPoint]:
+    return set(CollisionPoint(**c) for c in collisions_rows)
+
+
+def read_signalling_groups(
+    signalling_groups_rows, traffic_streams_rows
+) -> t.List[SignallingGroup]:
+    streams = read_traffic_streams(traffic_streams_rows)
+    return [
+        SignallingGroup(
+            name=g["props"]["children"][0]["props"]["value"],
+            streams=set(
+                s
+                for s in streams
+                if s.stream_id in g["props"]["children"][1]["props"]["value"]
+            ),
+        )
+        for g in signalling_groups_rows
+    ]
