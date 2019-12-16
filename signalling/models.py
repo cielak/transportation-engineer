@@ -1,19 +1,27 @@
 import typing as t
 
 
-class StreamIntersection(t.NamedTuple):
-    evacuating_stream: "TrafficStream"
-    evacuation_distance: float
-    arriving_stream: "TrafficStream"
-    arrival_distance: float
-
-
 class TrafficStream(t.NamedTuple):
+    stream_id: str
     evacuation_velocity: int
     arrival_velocity: int
     evacuating_yellow_time: int
     vehicle_length: int
-    stream_intersections: t.Set[StreamIntersection]
+
+
+class StreamIntersection(t.NamedTuple):
+    evacuating_stream: TrafficStream
+    evacuation_distance: float
+    arriving_stream: TrafficStream
+    arrival_distance: float
+
+    def inverted(self):
+        return StreamIntersection(
+            self.arriving_stream,
+            self.arrival_distance,
+            self.evacuating_stream,
+            self.evacuation_distance,
+        )
 
 
 class CollisionPoint(t.NamedTuple):
