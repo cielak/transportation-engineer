@@ -10,6 +10,7 @@ from signalling.logic import intersect_traffic_streams, collision_intergreen_tim
 
 
 HEADER = "evac\\arr"
+EMPTY = "X"
 
 
 def add_callbacks(app):
@@ -134,7 +135,7 @@ def add_callbacks(app):
         data = OrderedDict()
         for stream in streams:
             columns.append({"name": stream.stream_id, "id": stream.stream_id})
-            data[stream] = {HEADER: stream.stream_id}
+            data[stream] = {HEADER: stream.stream_id, stream.stream_id: EMPTY}
         for collision in collisions:
             data[collision.evacuating_stream].update(
                 {
@@ -168,7 +169,7 @@ def add_callbacks(app):
         data = OrderedDict()
         for group in groups:
             columns.append({"name": group.name, "id": group.name})
-            data[group.name] = {HEADER: group.name}
+            data[group.name] = {HEADER: group.name, group.name: EMPTY}
             # for c in collisions:
             #     data[group.name].update(...)
         return [dt.DataTable(columns=columns, data=list(data.values()))]
