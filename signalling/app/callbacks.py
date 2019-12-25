@@ -9,7 +9,6 @@ from signalling.app import formatters, validators
 from signalling.logic import (
     intersect_traffic_streams,
     collision_intergreen_time,
-    group_collision_intergreen_time,
     groups_intergreen_times,
 )
 
