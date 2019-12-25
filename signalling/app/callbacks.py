@@ -6,8 +6,12 @@ import dash_html_components as html
 import dash_table as dt
 
 from signalling.app import formatters, validators
-from signalling.logic import intersect_traffic_streams, collision_intergreen_time
-
+from signalling.logic import (
+    intersect_traffic_streams,
+    collision_intergreen_time,
+    group_collision_intergreen_time,
+    groups_intergreen_times,
+)
 
 HEADER = "evac\\arr"
 EMPTY = "X"
@@ -160,16 +164,17 @@ def add_callbacks(app):
         ],
     )
     def set_groups_intergreen_matrix(_, collisions_rows, groups_rows, streams_rows):
-        # collisions = formatters.read_collision_points(collisions_rows)
+        collisions = formatters.read_collision_points(collisions_rows)
         groups = sorted(
             formatters.read_signalling_groups(groups_rows, streams_rows),
             key=lambda x: x.name,
         )
+        intergreens = groups_intergreen_times(groups, collisions)
         columns = [{"name": HEADER, "id": HEADER}]
         data = OrderedDict()
         for group in groups:
             columns.append({"name": group.name, "id": group.name})
             data[group.name] = {HEADER: group.name, group.name: EMPTY}
-            # for c in collisions:
-            #     data[group.name].update(...)
+            for i in intergreens:
+                data[group.name].update({i.arriving_group.name: i.intergreen_time})
         return [dt.DataTable(columns=columns, data=list(data.values()))]
