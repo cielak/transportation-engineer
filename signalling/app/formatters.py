@@ -34,7 +34,15 @@ def return_collision_point(collision_point: CollisionPoint) -> dict:
     }
 
 
-def read_collision_points(collisions_rows) -> t.Set[CollisionPoint]:
+def read_collision_points(collisions_rows, streams) -> t.Set[CollisionPoint]:
+    updated_collisions = collisions_rows.copy()
+    for c in updated_collisions:
+        e_id = c["evacuating_stream"]
+        a_id = c["arriving_stream"]
+        e_stream = [x for x in streams if x.stream_id == e_id][0]
+        a_stream = [x for x in streams if x.stream_id == a_id][0]
+        c["evacuating_stream"] = e_stream
+        c["arriving_stream"] = a_stream
     return set(CollisionPoint(**c) for c in collisions_rows)
 
 

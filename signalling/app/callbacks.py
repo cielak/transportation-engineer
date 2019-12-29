@@ -163,7 +163,8 @@ def add_callbacks(app):
         ],
     )
     def set_groups_intergreen_matrix(_, collisions_rows, groups_rows, streams_rows):
-        collisions = formatters.read_collision_points(collisions_rows)
+        streams = formatters.read_traffic_streams(streams_rows)
+        collisions = formatters.read_collision_points(collisions_rows, streams)
         groups = sorted(
             formatters.read_signalling_groups(groups_rows, streams_rows),
             key=lambda x: x.name,
