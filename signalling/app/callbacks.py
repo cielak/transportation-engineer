@@ -177,5 +177,7 @@ def add_callbacks(app):
             data[group.name] = {HEADER: group.name, group.name: EMPTY}
             for i in intergreens:
                 if i.arriving_group.name == group.name:
-                    data[group.name].update({i.evacuating_group.name: i.intergreen_time})
+                    data[group.name].update(
+                        {i.evacuating_group.name: i.intergreen_time}
+                    )
         return [dt.DataTable(columns=columns, data=list(data.values()))]
