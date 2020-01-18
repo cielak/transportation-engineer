@@ -58,7 +58,11 @@ def add_callbacks(app):
             groups_rows.append(
                 html.Div(
                     children=[
-                        html.Button("x", id="remove_group_{}_button".format(n_clicks), n_clicks=0),
+                        html.Button(
+                            "x",
+                            id="remove_group_{}_button".format(n_clicks),
+                            n_clicks=0,
+                        ),
                         dcc.Input(id="group_id"),
                         dcc.Dropdown(
                             id="group_streams", options=options, value=[], multi=True
