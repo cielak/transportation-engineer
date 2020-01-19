@@ -1,7 +1,16 @@
 import pytest
 
-from signalling.logic import intergreen_time, groups_intergreen_times
-from signalling.models import TrafficStream, StreamIntersection
+from signalling.logic import (
+    intergreen_time,
+    groups_intergreen_times,
+    intersect_traffic_streams,
+)
+from signalling.models import (
+    TrafficStream,
+    StreamIntersection,
+    SignallingGroup,
+    GroupIntergreen,
+)
 
 
 class TestModels:
@@ -16,12 +25,26 @@ class TestModels:
 
 class TestLogic:
     @pytest.fixture
-    def groups(self):
-        return set()
+    def stream_k(self):
+        return TrafficStream("K1", 10, 14, 3, 10)
 
     @pytest.fixture
-    def collisions(self):
-        return set()
+    def stream_p(self):
+        return TrafficStream("P1", 1.4, 1, 0, 0)
+
+    @pytest.fixture
+    def groups(self, stream_k, stream_p):
+        return [
+            SignallingGroup(name="K", streams=set([stream_k])),
+            SignallingGroup(name="P", streams=set([stream_p])),
+        ]
+
+    @pytest.fixture
+    def stream_intersections(self, stream_k, stream_p):
+        return set(
+            StreamIntersection(stream_k, k, stream_p, p)
+            for k, p in [(2, 0), (2, 6), (8, 0), (8, 6)]
+        )
 
     @pytest.mark.parametrize(
         "evac_yellow_time, evac_time, arr_time, intergreen",
@@ -30,6 +53,10 @@ class TestLogic:
     def test_intergreen_time(self, evac_yellow_time, evac_time, arr_time, intergreen):
         assert intergreen_time(evac_yellow_time, evac_time, arr_time) == intergreen
 
-    def test_groups_intergreen_times(self, groups, collisions):
-        intergreens = groups_intergreen_times(groups, collisions)
-        assert intergreens == []
+    def test_groups_intergreen_times(self, groups, stream_intersections):
+        collision_points = intersect_traffic_streams(stream_intersections)
+        intergreens = sorted(groups_intergreen_times(groups, collision_points))
+        assert intergreens == [
+            GroupIntergreen(groups[0], groups[1], 5),
+            GroupIntergreen(groups[1], groups[0], 5),
+        ]

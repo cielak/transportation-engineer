@@ -58,7 +58,7 @@ def collision_intergreen_time(collision_point: CollisionPoint) -> int:
 
 
 def groups_intergreen_times(
-    groups: t.Set[SignallingGroup], collisions: t.Set[CollisionPoint]
+    groups: t.List[SignallingGroup], collisions: t.Set[CollisionPoint]
 ) -> t.List[GroupIntergreen]:
     group_intergreens = []
     for c in collisions:
