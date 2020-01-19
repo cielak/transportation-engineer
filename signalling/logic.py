@@ -61,18 +61,23 @@ def groups_intergreen_times(
     groups: t.List[SignallingGroup], collisions: t.Set[CollisionPoint]
 ) -> t.List[GroupIntergreen]:
     group_intergreens = []
-    for c in collisions:
-        for ev_gr in groups:
-            if c.evacuating_stream in ev_gr.streams:
-                for ar_gr in groups:
-                    if c.arriving_stream in ar_gr.streams:
-                        group_intergreens.append(
-                            GroupIntergreen(
-                                evacuating_group=ev_gr,
-                                arriving_group=ar_gr,
-                                intergreen_time=collision_intergreen_time(c),
-                            )
-                        )
+    for ev_gr, ar_gr in product(groups, groups):
+        intergreens = [
+            collision_intergreen_time(c)
+            for c in collisions
+            if (
+                c.evacuating_stream in ev_gr.streams
+                and c.arriving_stream in ar_gr.streams
+            )
+        ]
+        if intergreens:
+            group_intergreens.append(
+                GroupIntergreen(
+                    evacuating_group=ev_gr,
+                    arriving_group=ar_gr,
+                    intergreen_time=max(intergreens),
+                )
+            )
     return group_intergreens
 
 
