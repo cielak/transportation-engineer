@@ -4,12 +4,7 @@ import dash_html_components as html
 
 from signalling.app import callbacks
 
-from signalling.models import (
-    SignallingGroup,
-    TrafficStream,
-    StreamIntersection,
-    CollisionPoint,
-)
+from signalling.models import TrafficStream, StreamIntersection, CollisionPoint
 
 
 def app_init(app: dash.Dash):
@@ -64,6 +59,12 @@ def app_init(app: dash.Dash):
             html.H2("Signalling groups"),
             html.Button("Add group", id="add_group_button", n_clicks=0),
             html.Div(id="groups_table", children=[]),
+            html.Button(
+                "Refresh groups intergreen times",
+                id="refresh_groups_intergreen_matrix_button",
+                n_clicks=0,
+            ),
+            html.Div(id="groups_intergreen_matrix", children=[]),
         ]
     )
 

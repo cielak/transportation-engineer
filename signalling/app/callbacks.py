@@ -6,7 +6,14 @@ import dash_html_components as html
 import dash_table as dt
 
 from signalling.app import formatters, validators
-from signalling.logic import intersect_traffic_streams, collision_intergreen_time
+from signalling.logic import (
+    intersect_traffic_streams,
+    collision_intergreen_time,
+    groups_intergreen_times,
+)
+
+HEADER = "evac\\arr"
+EMPTY = "X"
 
 
 def add_callbacks(app):
@@ -35,6 +42,35 @@ def add_callbacks(app):
         if n_clicks > 0:
             rows.append({c["id"]: "" for c in columns})
         return rows
+
+    @app.callback(
+        dash.dependencies.Output("groups_table", "children"),
+        [dash.dependencies.Input("add_group_button", "n_clicks")],
+        [
+            dash.dependencies.State("groups_table", "children"),
+            dash.dependencies.State("streams_table", "data"),
+        ],
+    )
+    def add_group(n_clicks, groups_rows, streams_rows):
+        if n_clicks > 0:
+            vals = [x["stream_id"] for x in streams_rows]
+            options = [{"label": i, "value": i} for i in vals]
+            groups_rows.append(
+                html.Div(
+                    children=[
+                        html.Button(
+                            "x",
+                            id="remove_group_{}_button".format(n_clicks),
+                            n_clicks=0,
+                        ),
+                        dcc.Input(id="group_id"),
+                        dcc.Dropdown(
+                            id="group_streams", options=options, value=[], multi=True
+                        ),
+                    ]
+                )
+            )
+        return groups_rows
 
     @app.callback(
         dash.dependencies.Output("stream_intersections_table", "dropdown"),
@@ -103,37 +139,50 @@ def add_callbacks(app):
             intersections_data, streams
         )
         collisions = intersect_traffic_streams(intersections)
-        columns = [{"name": "evac\\arr", "id": "evac\\arr"}]
+        columns = [{"name": HEADER, "id": HEADER}]
         data = OrderedDict()
-        for s in streams:
-            columns.append({"name": s.stream_id, "id": s.stream_id})
-            data[s.stream_id] = {"evac\\arr": s.stream_id}
-        for c in collisions:
-            data[c.evacuating_stream.stream_id].update(
-                {c.arriving_stream.stream_id: collision_intergreen_time(c)}
+        for stream in streams:
+            columns.append({"name": stream.stream_id, "id": stream.stream_id})
+            data[stream] = {HEADER: stream.stream_id, stream.stream_id: EMPTY}
+        for collision in collisions:
+            data[collision.evacuating_stream].update(
+                {
+                    collision.arriving_stream.stream_id: collision_intergreen_time(
+                        collision
+                    )
+                }
             )
         return [dt.DataTable(columns=columns, data=list(data.values()))]
 
     @app.callback(
-        dash.dependencies.Output("groups_table", "children"),
-        [dash.dependencies.Input("add_group_button", "n_clicks")],
+        dash.dependencies.Output("groups_intergreen_matrix", "children"),
+        [
+            dash.dependencies.Input(
+                "refresh_groups_intergreen_matrix_button", "n_clicks"
+            ),
+            dash.dependencies.Input("stream_collisions_table", "data"),
+        ],
         [
             dash.dependencies.State("groups_table", "children"),
             dash.dependencies.State("streams_table", "data"),
         ],
     )
-    def add_group(n_clicks, groups_rows, streams_rows):
-        if n_clicks > 0:
-            vals = [x["stream_id"] for x in streams_rows]
-            options = [{"label": i, "value": i} for i in vals]
-            groups_rows.append(
-                html.Div(
-                    children=[
-                        dcc.Input(id="group_id"),
-                        dcc.Dropdown(
-                            id="group_streams", options=options, value=[], multi=True
-                        ),
-                    ]
-                )
-            )
-        return groups_rows
+    def set_groups_intergreen_matrix(_, collisions_rows, groups_rows, streams_rows):
+        streams = formatters.read_traffic_streams(streams_rows)
+        collisions = formatters.read_collision_points(collisions_rows, streams)
+        groups = sorted(
+            formatters.read_signalling_groups(groups_rows, streams_rows),
+            key=lambda x: x.name,
+        )
+        intergreens = groups_intergreen_times(groups, collisions)
+        columns = [{"name": HEADER, "id": HEADER}]
+        data = OrderedDict()
+        for group in groups:
+            columns.append({"name": group.name, "id": group.name})
+            data[group.name] = {HEADER: group.name, group.name: EMPTY}
+            for i in intergreens:
+                if i.arriving_group.name == group.name:
+                    data[group.name].update(
+                        {i.evacuating_group.name: i.intergreen_time}
+                    )
+        return [dt.DataTable(columns=columns, data=list(data.values()))]

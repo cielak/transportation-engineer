@@ -1,3 +1,5 @@
+black
 dash
 gunicorn
 plotly
+pytest

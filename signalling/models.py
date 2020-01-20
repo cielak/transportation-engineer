@@ -36,6 +36,12 @@ class SignallingGroup(t.NamedTuple):
     streams: t.Set[TrafficStream]
 
 
+class GroupIntergreen(t.NamedTuple):
+    evacuating_group: SignallingGroup
+    arriving_group: SignallingGroup
+    intergreen_time: int
+
+
 class SignallingPhase(t.NamedTuple):
     green_groups: set
     red_groups: set
