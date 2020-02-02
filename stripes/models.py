@@ -2,11 +2,6 @@ from enum import Enum
 import typing as t
 
 
-# SecondType = Enum(
-#    "SecondType", "off red red_yellow green yellow green_blinking yellow_blinking"
-# )
-
-
 class SecondType(Enum):
     off = "off"
     red = "red"
@@ -31,7 +26,13 @@ class GroupStripe(t.NamedTuple):
     def from_ranges(cls, name, ranges: t.List[SecondsRange]):
         sorted_ranges = sorted(ranges, key=lambda x: x.start)
         seconds = []
+        last_stop = 0
         for r in sorted_ranges:
+            if last_stop != r.start:
+                raise ValueError(
+                    "Program must be continous and start from 0, no empty seconds allowed!"
+                )
+            last_stop = r.stop
             seconds.extend([r.type for _ in range(r.stop - r.start)])
         return cls(name, seconds)
 
