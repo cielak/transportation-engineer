@@ -24,10 +24,9 @@ class TestModels:
             + [SecondType.green] * 5
         )
 
-    @pytest.mark.parametrize("red_start, red_stop", [
-        [0, 9],
-        [1, 10],
-    ])
+    @pytest.mark.parametrize("red_start, red_stop", [[0, 9], [1, 10],])
     def test_group_stipe_invalid(self, red_start, red_stop):
         with pytest.raises(ValueError):
-            GroupStripe.from_ranges_dict("T1", {"red": [(red_start, red_stop)], "green": [(10, 20)]})
+            GroupStripe.from_ranges_dict(
+                "T1", {"red": [(red_start, red_stop)], "green": [(10, 20)]}
+            )
