@@ -1,3 +1,4 @@
+import base64
 from collections import defaultdict
 
 import dash
@@ -7,7 +8,7 @@ from dash.dependencies import Input, Output, State
 import dash_table as dt
 
 from stripes.models import ProgramStripes, SecondType
-from stripes.render import SimpleRenderer
+from stripes.render import SvgRenderer
 
 def format_rows(rows):
     def format_row(row):
@@ -40,9 +41,10 @@ def add_callbacks(app):
         if not n_clicks:
             return
         formatted_rows = format_rows(rows)
-        renderer = SimpleRenderer()
-        content = renderer.render_program(ProgramStripes.from_ranges_list(formatted_rows))
-        return html.Div(content)
+        renderer = SvgRenderer()
+        raw_content = renderer.render_program(ProgramStripes.from_ranges_list(formatted_rows))
+        content = str(base64.b64encode(raw_content.encode('utf-8')), 'utf-8')
+        return html.Img(src='data:image/svg+xml;base64,'+content), raw_content
 
 
 layout = html.Div(
