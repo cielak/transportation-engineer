@@ -14,26 +14,34 @@ class SimpleRenderer:
         return str([self.render_group(g) for g in program.groups])
 
 class SvgRenderer:
-    def render_second(self, second_type):
-        dwg = svgwrite.Drawing()
+    def render_second(self, second_type, insert=(0,0)):
+        gr = svgwrite.container.Group(id=second_type.name)
+        defaults = {'size': ('5mm', '5mm'), 'insert':insert}
         if second_type == SecondType.off:
-            pass
+            gr.add(svgwrite.shapes.Rect(**defaults, fill='gray'))
         elif second_type == SecondType.red:
-            pass
+            gr.add(svgwrite.shapes.Rect(**defaults, fill='red'))
         elif second_type == SecondType.green:
-            pass
-        return dwg
+            gr.add(svgwrite.shapes.Rect(**defaults, fill='green'))
+        elif second_type == SecondType.yellow:
+            gr.add(svgwrite.shapes.Rect(**defaults, fill='yellow'))
+        else:
+            raise ValueErrorr('Unknown signal second type')
+        return gr
 
     def render_group(self, group):
         dwg = svgwrite.Drawing()
-        paragraph = dwg.add(dwg.g(font_size=14))
-        paragraph.add(dwg.text(group.name, (10, 20)))
-        
-        return dwg
+        paragraph = dwg.g(font_size='5mm')
+        paragraph.add(dwg.text(group.name, ('1mm', '4.5mm')))
+        for i, second in enumerate(group.seconds):
+            insert=('{}mm'.format(5*i+20), '0mm')
+            s = self.render_second(second, insert)
+            paragraph.add(s)
+        return paragraph
 
     def render_program(self, program):
         dwg = svgwrite.Drawing()
         for group in program.groups:
-            # gr = self.render_group(group)
-            dwg.add(dwg.text(group.name, dx=[10], dy=[50], fill='black'))
+            gr = self.render_group(group)
+            dwg.add(gr)
         return dwg.tostring()
