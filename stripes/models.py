@@ -48,8 +48,7 @@ class GroupStripe(t.NamedTuple):
 
 class ProgramStripes(t.NamedTuple):
     groups: t.List[GroupStripe]
-    
+
     @classmethod
     def from_ranges_list(cls, groups):
         return cls([GroupStripe.from_ranges_dict(*g) for g in groups])
-
