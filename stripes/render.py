@@ -15,8 +15,8 @@ class SimpleRenderer:
 
 class SvgRenderer:
     def render_second(self, second_type, insert=(0,0)):
-        gr = svgwrite.container.Group(id=second_type.name)
-        defaults = {'size': ('5mm', '5mm'), 'insert':insert}
+        gr = svgwrite.container.Group()
+        defaults = {'size': (5, 5), 'insert':insert}
         if second_type == SecondType.off:
             gr.add(svgwrite.shapes.Rect(**defaults, fill='gray'))
         elif second_type == SecondType.red:
@@ -31,17 +31,18 @@ class SvgRenderer:
 
     def render_group(self, group):
         dwg = svgwrite.Drawing()
-        paragraph = dwg.g(font_size='5mm')
-        paragraph.add(dwg.text(group.name, ('1mm', '4.5mm')))
+        paragraph = dwg.g(font_size=4)
+        paragraph.add(dwg.text(group.name, insert=(1, 4.5)))
         for i, second in enumerate(group.seconds):
-            insert=('{}mm'.format(5*i+20), '0mm')
-            s = self.render_second(second, insert)
+            insert_s=(20+5*i, 0)
+            s = self.render_second(second, insert_s)
             paragraph.add(s)
         return paragraph
 
     def render_program(self, program):
-        dwg = svgwrite.Drawing()
-        for group in program.groups:
+        dwg = svgwrite.Drawing(size=(200*5, 200))
+        for i, group in enumerate(program.groups):
             gr = self.render_group(group)
+            gr.translate(1, 10+10*i)
             dwg.add(gr)
         return dwg.tostring()
