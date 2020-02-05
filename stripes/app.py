@@ -48,7 +48,7 @@ def add_callbacks(app):
             ProgramStripes.from_ranges_list(formatted_rows)
         )
         content = str(base64.b64encode(raw_content.encode("utf-8")), "utf-8")
-        return html.Img(src="data:image/svg+xml;base64," + content), raw_content
+        return html.Img(src="data:image/svg+xml;base64," + content)
 
 
 layout = html.Div(
