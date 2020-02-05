@@ -3,6 +3,7 @@ from collections import OrderedDict
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output, State
 import dash_table as dt
 
 from signalling.app import formatters, validators
@@ -18,12 +19,9 @@ EMPTY = "X"
 
 def add_callbacks(app):
     @app.callback(
-        dash.dependencies.Output("streams_table", "data"),
-        [dash.dependencies.Input("add_stream_button", "n_clicks")],
-        [
-            dash.dependencies.State("streams_table", "data"),
-            dash.dependencies.State("streams_table", "columns"),
-        ],
+        Output("streams_table", "data"),
+        [Input("add_stream_button", "n_clicks")],
+        [State("streams_table", "data"), State("streams_table", "columns"),],
     )
     def add_stream(n_clicks, rows, columns):
         if n_clicks > 0:
@@ -31,11 +29,11 @@ def add_callbacks(app):
         return rows
 
     @app.callback(
-        dash.dependencies.Output("stream_intersections_table", "data"),
-        [dash.dependencies.Input("add_stream_intersection_button", "n_clicks")],
+        Output("stream_intersections_table", "data"),
+        [Input("add_stream_intersection_button", "n_clicks")],
         [
-            dash.dependencies.State("stream_intersections_table", "data"),
-            dash.dependencies.State("stream_intersections_table", "columns"),
+            State("stream_intersections_table", "data"),
+            State("stream_intersections_table", "columns"),
         ],
     )
     def add_stream_intersection(n_clicks, rows, columns):
@@ -44,12 +42,9 @@ def add_callbacks(app):
         return rows
 
     @app.callback(
-        dash.dependencies.Output("groups_table", "children"),
-        [dash.dependencies.Input("add_group_button", "n_clicks")],
-        [
-            dash.dependencies.State("groups_table", "children"),
-            dash.dependencies.State("streams_table", "data"),
-        ],
+        Output("groups_table", "children"),
+        [Input("add_group_button", "n_clicks")],
+        [State("groups_table", "children"), State("streams_table", "data"),],
     )
     def add_group(n_clicks, groups_rows, streams_rows):
         if n_clicks > 0:
@@ -73,9 +68,9 @@ def add_callbacks(app):
         return groups_rows
 
     @app.callback(
-        dash.dependencies.Output("stream_intersections_table", "dropdown"),
-        [dash.dependencies.Input("streams_table", "data_timestamp")],
-        [dash.dependencies.State("streams_table", "data")],
+        Output("stream_intersections_table", "dropdown"),
+        [Input("streams_table", "data_timestamp")],
+        [State("streams_table", "data")],
     )
     def set_available_streams_for_stream_intersections(timestamp, rows):
         vals = [x["stream_id"] for x in rows]
@@ -84,15 +79,12 @@ def add_callbacks(app):
         return dropdown
 
     @app.callback(
-        dash.dependencies.Output("stream_collisions_table", "data"),
+        Output("stream_collisions_table", "data"),
         [
-            dash.dependencies.Input("streams_table", "data_timestamp"),
-            dash.dependencies.Input("stream_intersections_table", "data_timestamp"),
+            Input("streams_table", "data_timestamp"),
+            Input("stream_intersections_table", "data_timestamp"),
         ],
-        [
-            dash.dependencies.State("streams_table", "data"),
-            dash.dependencies.State("stream_intersections_table", "data"),
-        ],
+        [State("streams_table", "data"), State("stream_intersections_table", "data"),],
     )
     def set_collisions_data(_1, _2, streams_data, intersections_data):
         if not all(
@@ -114,15 +106,12 @@ def add_callbacks(app):
         return collisions_data
 
     @app.callback(
-        dash.dependencies.Output("stream_collisions_matrix", "children"),
+        Output("stream_collisions_matrix", "children"),
         [
-            dash.dependencies.Input("streams_table", "data_timestamp"),
-            dash.dependencies.Input("stream_intersections_table", "data_timestamp"),
+            Input("streams_table", "data_timestamp"),
+            Input("stream_intersections_table", "data_timestamp"),
         ],
-        [
-            dash.dependencies.State("streams_table", "data"),
-            dash.dependencies.State("stream_intersections_table", "data"),
-        ],
+        [State("streams_table", "data"), State("stream_intersections_table", "data"),],
     )
     def set_collisions_matrix(_1, _2, streams_data, intersections_data):
         if not all(
@@ -155,17 +144,12 @@ def add_callbacks(app):
         return [dt.DataTable(columns=columns, data=list(data.values()))]
 
     @app.callback(
-        dash.dependencies.Output("groups_intergreen_matrix", "children"),
+        Output("groups_intergreen_matrix", "children"),
         [
-            dash.dependencies.Input(
-                "refresh_groups_intergreen_matrix_button", "n_clicks"
-            ),
-            dash.dependencies.Input("stream_collisions_table", "data"),
+            Input("refresh_groups_intergreen_matrix_button", "n_clicks"),
+            Input("stream_collisions_table", "data"),
         ],
-        [
-            dash.dependencies.State("groups_table", "children"),
-            dash.dependencies.State("streams_table", "data"),
-        ],
+        [State("groups_table", "children"), State("streams_table", "data"),],
     )
     def set_groups_intergreen_matrix(_, collisions_rows, groups_rows, streams_rows):
         streams = formatters.read_traffic_streams(streams_rows)
