@@ -64,32 +64,57 @@ class SvgRenderer:
             gr.add(
                 svgwrite.shapes.Line(**line_defaults, start=(x + w, y), end=(x, y + h))
             )
+            gr.add(
+                svgwrite.shapes.Line(
+                    **line_defaults, start=(x + w / 2, y), end=(x, y + h / 2)
+                )
+            )
+            gr.add(
+                svgwrite.shapes.Line(
+                    **line_defaults, start=(x + w, y + h / 2), end=(x + w / 2, y + h)
+                )
+            )
         else:
             raise ValueError("Unknown signal second type")
         return gr
 
     def render_group(self, group):
+        w, h = self.second_size
         dwg = svgwrite.Drawing()
         paragraph = dwg.g(font_size=6)
         paragraph.add(dwg.text(group.name, insert=(0, 9)))
         last_type = group.seconds[-1]
-        for i, second in enumerate(group.seconds):
+        for i, second in enumerate(group.seconds + [None]):
             x, y = (20 + 5 * i, 0)
-            paragraph.add(self.render_second(second, insert=(x, y + 5)))
+            if second:
+                paragraph.add(self.render_second(second, insert=(x, y + 5)))
             tick_delta = 4 if i % 5 else 3
             paragraph.add(
                 dwg.line(stroke="black", start=(x, y + tick_delta), end=(x, y + 5))
             )
-            if last_type != second:
+            if second and last_type != second:
                 paragraph.add(dwg.text(str(i), insert=(x, y + 3), font_size=4))
                 paragraph.add(
                     dwg.line(stroke="black", start=(x, y + 10), end=(x, y + 5))
                 )
+            if second == SecondType.yellow and last_type != SecondType.yellow:
+                yl_start = (x, y + h + 5)
+            if last_type == SecondType.yellow and second != SecondType.yellow:
+                yl_end = (x, y + 5)
+                paragraph.add(dwg.line(stroke="black", start=yl_start, end=yl_end))
             last_type = second
+        paragraph.add(
+            dwg.rect(
+                fill="none",
+                stroke="black",
+                insert=(20, 5),
+                size=(len(group.seconds) * 5, 5),
+            )
+        )
         return paragraph
 
     def render_program(self, program):
-        dwg = svgwrite.Drawing(size=(200 * 5, 200))
+        dwg = svgwrite.Drawing(size=(200 * 5, 200), stroke_width=0.5)
         for i in range(1 + max(len(g.seconds) for g in program.groups)):
             x = 25 + i * 5
             y = 10
