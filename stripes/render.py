@@ -84,6 +84,7 @@ class SvgRenderer:
         paragraph = dwg.g(font_size=6)
         paragraph.add(dwg.text(group.name, insert=(0, 9)))
         last_type = group.seconds[-1]
+        l_place = None
         for i, second in enumerate(group.seconds + [None]):
             x, y = (20 + 5 * i, 0)
             if second:
@@ -97,12 +98,13 @@ class SvgRenderer:
                 paragraph.add(
                     dwg.line(stroke="black", start=(x, y + 10), end=(x, y + 5))
                 )
-            if second == SecondType.yellow and last_type != SecondType.yellow:
+            if second == SecondType.yellow and l_place != SecondType.yellow:
                 yl_start = (x, y + h + 5)
-            if last_type == SecondType.yellow and second != SecondType.yellow:
+            if l_place == SecondType.yellow and second != SecondType.yellow:
                 yl_end = (x, y + 5)
                 paragraph.add(dwg.line(stroke="black", start=yl_start, end=yl_end))
             last_type = second
+            l_place = second
         paragraph.add(
             dwg.rect(
                 fill="none",
