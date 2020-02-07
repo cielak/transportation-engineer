@@ -70,6 +70,10 @@ layout = html.Div(
                     "group_name": "P1",
                     "group_data": "off 0-2, red 2-10, yellow 10-11, green 11-15",
                 },
+                {
+                    "group_name": "demo",
+                    "group_data": "off 0-5, red 5-10, red_yellow 10-11, green 11-15, yellow 15-18, green_blinking 18-22, yellow_blinking 22-27",
+                },
             ],
             editable=True,
             row_deletable=True,
