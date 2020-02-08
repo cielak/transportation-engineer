@@ -50,9 +50,6 @@ class SvgRenderer:
                     **line_defaults, start=(x, y + h / 2), end=(x + w, y + h / 2)
                 )
             )
-            gr.add(
-                svgwrite.shapes.Line(**line_defaults, start=(x + w, y), end=(x, y + h))
-            )
         elif second_type == SecondType.green:
             gr.add(svgwrite.shapes.Rect(**defaults, fill="green"))
         elif second_type == SecondType.yellow:
@@ -121,9 +118,13 @@ class SvgRenderer:
                     dwg.line(stroke="black", start=(x, y + 10), end=(x, y + 5))
                 )
             last_type = second
-            if second == SecondType.yellow and l_place != SecondType.yellow:
+            if (second == SecondType.yellow and l_place != SecondType.yellow) or (
+                second == SecondType.red_yellow and l_place != SecondType.red_yellow
+            ):
                 yl_start = (x, y + h + 5)
-            if l_place == SecondType.yellow and second != SecondType.yellow:
+            if (l_place == SecondType.yellow and second != SecondType.yellow) or (
+                l_place == SecondType.red_yellow and second != SecondType.red_yellow
+            ):
                 yl_end = (x, y + 5)
                 paragraph.add(dwg.line(stroke="black", start=yl_start, end=yl_end))
             if second == SecondType.green and l_place != SecondType.green:
@@ -158,22 +159,43 @@ class SvgRenderer:
         return paragraph
 
     def render_program(self, program):
-        dwg = svgwrite.Drawing()
-        prog = dwg.g(id="program-stripes", stroke_width=0.5)
-        for i in range(1 + max(len(g.seconds) for g in program.groups)):
-            x = 25 + i * 5
-            y = 10
-            prog.add(
-                dwg.line(stroke="black", stroke_width=0.5, start=(x, y), end=(x + 5, y))
+        scale = 3
+        group_height = 11
+        left_margin = 5
+
+        sec_w, sec_h = self.second_size
+        max_len = max(len(g.seconds) for g in program.groups)
+        dwg = svgwrite.Drawing(
+            size=(
+                scale * (10 + 5 + 20 + 10 + 5 * (1 + max_len)),
+                scale * (20 + len(program.groups) * group_height),
             )
+        )
+        prog = dwg.g(id="program-stripes", stroke_width=0.5)
+        for i in range(max_len + 1):
+            x = 20 + left_margin + i * sec_w
+            y = 10
+            if i < max_len:
+                prog.add(
+                    dwg.line(
+                        stroke="black",
+                        stroke_width=0.5,
+                        start=(x, y),
+                        end=(x + sec_w, y),
+                    )
+                )
             prog.add(dwg.line(stroke="black", start=(x, y), end=(x, y + 3)))
             if i % 5 == 0:
                 prog.add(dwg.line(stroke="black", start=(x, y), end=(x, y - 4)))
-                prog.add(dwg.text(str(i), insert=(x + 2, y - 2), font_size=5))
+                prog.add(dwg.text(str(i), insert=(x - 1, y - 5), font_size=4))
+            if i == max_len and i % 5 != 0:
+                prog.add(dwg.line(stroke="black", start=(x, y), end=(x, y - 4)))
+                end_txt = dwg.text(str(i), insert=(x + 2, y), font_size=4)
+                prog.add(end_txt)
         for i, group in enumerate(program.groups):
             gr = self.render_group(group)
-            gr.translate(5, 20 + 10 * i)
+            gr.translate(left_margin, 15 + group_height * i)
             prog.add(gr)
-        prog.scale(3)
+        prog.scale(scale)
         dwg.add(prog)
         return dwg.tostring()
