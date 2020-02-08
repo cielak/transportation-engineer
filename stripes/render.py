@@ -198,4 +198,4 @@ class SvgRenderer:
             prog.add(gr)
         prog.scale(scale)
         dwg.add(prog)
-        return dwg.tostring()
+        return dwg

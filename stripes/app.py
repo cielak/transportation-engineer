@@ -11,7 +11,7 @@ from stripes.models import ProgramStripes, SecondType
 from stripes.render import SvgRenderer
 
 
-def format_rows(rows):
+def read_rows(rows):
     def format_row(row):
         data = [s.strip() for s in row["group_data"].split(",")]
         row_data = defaultdict(list)
@@ -21,6 +21,12 @@ def format_rows(rows):
         return [row["group_name"], row_data]
 
     return [format_row(row) for row in rows]
+
+
+def format_svg(dwg):
+    raw_content = dwg.tostring()
+    content = str(base64.b64encode(raw_content.encode("utf-8")), "utf-8")
+    return html.Img(src="data:image/svg+xml;base64," + content)
 
 
 def add_callbacks(app):
@@ -42,13 +48,10 @@ def add_callbacks(app):
     def render_stripes(n_clicks, rows):
         if not n_clicks:
             return
-        formatted_rows = format_rows(rows)
+        formatted_rows = read_rows(rows)
         renderer = SvgRenderer()
-        raw_content = renderer.render_program(
-            ProgramStripes.from_ranges_list(formatted_rows)
-        )
-        content = str(base64.b64encode(raw_content.encode("utf-8")), "utf-8")
-        return html.Img(src="data:image/svg+xml;base64," + content)
+        svg = renderer.render_program(ProgramStripes.from_ranges_list(formatted_rows))
+        return format_svg(svg)
 
 
 layout = html.Div(
