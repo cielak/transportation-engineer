@@ -141,15 +141,16 @@ class SvgRenderer:
                     )
                 g.add(dwg.line(stroke="black", start=(x, y + 10), end=(x, y + 5)))
             last_type = second
-            if (second == SecondType.yellow and l_place != SecondType.yellow) or (
-                second == SecondType.red_yellow and l_place != SecondType.red_yellow
-            ):
+            if second == SecondType.yellow and l_place != SecondType.yellow:
                 yl_start = (x, y + h + 5)
-            if (l_place == SecondType.yellow and second != SecondType.yellow) or (
-                l_place == SecondType.red_yellow and second != SecondType.red_yellow
-            ):
+            if l_place == SecondType.yellow and second != SecondType.yellow:
                 yl_end = (x, y + 5)
                 g.add(dwg.line(stroke="black", start=yl_start, end=yl_end))
+            if second == SecondType.red_yellow and l_place != SecondType.red_yellow:
+                ryl_start = (x, y + h + 5)
+            if l_place == SecondType.red_yellow and second != SecondType.red_yellow:
+                ryl_end = (x, y + 5)
+                g.add(dwg.line(stroke="black", start=ryl_start, end=ryl_end))
             l_place = second
         g.add(
             dwg.rect(
