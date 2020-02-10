@@ -25,7 +25,7 @@ layout = html.Div(
         ),
         html.H2("Stream intersections"),
         html.Button(
-            "Add stream intersection", id="add_stream_intersection_button", n_clicks=0,
+            "Add stream intersection", id="add_stream_intersection_button", n_clicks=0
         ),
         dt.DataTable(
             id="stream_intersections_table",

@@ -21,7 +21,7 @@ def add_callbacks(app):
     @app.callback(
         Output("streams_table", "data"),
         [Input("add_stream_button", "n_clicks")],
-        [State("streams_table", "data"), State("streams_table", "columns"),],
+        [State("streams_table", "data"), State("streams_table", "columns")],
     )
     def add_stream(n_clicks, rows, columns):
         if n_clicks > 0:
@@ -44,7 +44,7 @@ def add_callbacks(app):
     @app.callback(
         Output("groups_table", "children"),
         [Input("add_group_button", "n_clicks")],
-        [State("groups_table", "children"), State("streams_table", "data"),],
+        [State("groups_table", "children"), State("streams_table", "data")],
     )
     def add_group(n_clicks, groups_rows, streams_rows):
         if n_clicks > 0:
@@ -84,7 +84,7 @@ def add_callbacks(app):
             Input("streams_table", "data_timestamp"),
             Input("stream_intersections_table", "data_timestamp"),
         ],
-        [State("streams_table", "data"), State("stream_intersections_table", "data"),],
+        [State("streams_table", "data"), State("stream_intersections_table", "data")],
     )
     def set_collisions_data(_1, _2, streams_data, intersections_data):
         if not all(
@@ -111,7 +111,7 @@ def add_callbacks(app):
             Input("streams_table", "data_timestamp"),
             Input("stream_intersections_table", "data_timestamp"),
         ],
-        [State("streams_table", "data"), State("stream_intersections_table", "data"),],
+        [State("streams_table", "data"), State("stream_intersections_table", "data")],
     )
     def set_collisions_matrix(_1, _2, streams_data, intersections_data):
         if not all(
@@ -149,7 +149,7 @@ def add_callbacks(app):
             Input("refresh_groups_intergreen_matrix_button", "n_clicks"),
             Input("stream_collisions_table", "data"),
         ],
-        [State("groups_table", "children"), State("streams_table", "data"),],
+        [State("groups_table", "children"), State("streams_table", "data")],
     )
     def set_groups_intergreen_matrix(_, collisions_rows, groups_rows, streams_rows):
         streams = formatters.read_traffic_streams(streams_rows)

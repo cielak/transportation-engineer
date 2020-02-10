@@ -37,7 +37,7 @@ class GroupStripe(t.NamedTuple):
         return cls(name, seconds)
 
     @classmethod
-    def from_ranges_dict(cls, name, data: dict):
+    def from_ranges_dict(cls, name: str, data: dict):
         ranges = []
         for type_name, ranges_list in data.items():
             type = SecondType(type_name)
