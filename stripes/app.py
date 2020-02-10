@@ -56,10 +56,14 @@ def add_callbacks(app):
         if not n_clicks:
             return
         formatted_rows = read_rows(rows)
-        formatted_annotations = [
-            (int(x.split()[0]), " ".join(x.split()[1:]))
-            for x in annotations.split(", ")
-        ]
+        formatted_annotations = (
+            [
+                (int(x.split()[0]), " ".join(x.split()[1:]))
+                for x in annotations.split(", ")
+            ]
+            if annotations
+            else None
+        )
         annotate_greens = green_lengths == ["green_lengths"]
         renderers = [
             SvgRenderer(),
