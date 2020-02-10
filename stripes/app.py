@@ -65,21 +65,15 @@ def add_callbacks(app):
             else None
         )
         annotate_greens = green_lengths == ["green_lengths"]
-        renderers = [
-            SvgRenderer(),
-            SvgRenderer(
-                annotate_greens=annotate_greens,
-                left_offset=left_offset,
-                right_offset=right_offset,
-                annotations=formatted_annotations,
-            ),
-        ]
-        return [
-            format_svg(
-                r.render_program(ProgramStripes.from_ranges_list(formatted_rows))
-            )
-            for r in renderers
-        ]
+        renderer = SvgRenderer(
+            annotate_greens=annotate_greens,
+            left_offset=left_offset,
+            right_offset=right_offset,
+            annotations=formatted_annotations,
+        )
+        return format_svg(
+            renderer.render_program(ProgramStripes.from_ranges_list(formatted_rows))
+        )
 
 
 layout = html.Div(
@@ -89,23 +83,16 @@ layout = html.Div(
             [
                 html.Div("Available values:"),
                 html.Ul([html.Li(t.name) for t in SecondType]),
+                html.Div(
+                    "Example input: || K1 | off 0-5, yellow 5-10, red 10-30, red_yellow 30-31, green 31-50, yellow 50-53, red 53-60 ||"
+                ),
             ]
         ),
         html.Button("Add group", id="add_group_button", n_clicks=0),
         dt.DataTable(
             id="groups_table",
             columns=[{"name": x, "id": x} for x in ["group_name", "group_data"]],
-            data=[
-                {"group_name": "K1", "group_data": "off 0-5, red 5-10, green 10-15"},
-                {
-                    "group_name": "P1",
-                    "group_data": "off 0-2, red 2-10, yellow 10-11, green 11-15",
-                },
-                {
-                    "group_name": "demo",
-                    "group_data": "off 0-5, red 5-10, red_yellow 10-11, green 11-15, yellow 15-18, green_blinking 18-22, yellow_blinking 22-27",
-                },
-            ],
+            data=[{"group_name": "", "group_data": ""} for _ in range(2)],
             editable=True,
             row_deletable=True,
         ),
@@ -124,6 +111,7 @@ layout = html.Div(
                                             "value": "green_lengths",
                                         }
                                     ],
+                                    value=["green_lengths"],
                                 )
                             )
                         ),
@@ -134,7 +122,7 @@ layout = html.Div(
                                     dcc.Input(
                                         id="program_stripes_left_offset_input",
                                         type="number",
-                                        value=2,
+                                        value=0,
                                     )
                                 ),
                             ]
@@ -146,7 +134,7 @@ layout = html.Div(
                                     dcc.Input(
                                         id="program_stripes_right_offset_input",
                                         type="number",
-                                        value=2,
+                                        value=0,
                                     )
                                 ),
                             ]
@@ -158,7 +146,7 @@ layout = html.Div(
                                     dcc.Input(
                                         id="program_stripes_annotations_input",
                                         type="text",
-                                        value="-2 Faza 1, 0 PF 1-2, 23 Faza 2",
+                                        placeholder="0 Phase 1, 5 Phase shift, 10, Phase 2",
                                         size="50",
                                     )
                                 ),
