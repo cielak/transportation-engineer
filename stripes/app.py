@@ -72,7 +72,7 @@ def add_callbacks(app):
             annotations=formatted_annotations,
         )
         return format_svg(
-            renderer.render_program(ProgramStripes.from_ranges_list(formatted_rows))
+            renderer.render(ProgramStripes.from_ranges_list(formatted_rows))
         )
 
 
