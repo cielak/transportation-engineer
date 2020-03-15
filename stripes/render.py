@@ -1,4 +1,6 @@
 import svgwrite
+from svgwrite.shapes import Rect, Line
+from svgwrite.text import Text
 
 from stripes.models import SecondType
 
@@ -25,6 +27,25 @@ class SvgRenderer:
         self.right_offset = right_offset
         self.annotations = annotations
 
+    def _rect(self, insert, size, stroke="black", stroke_width=0.5, fill=None):
+        return Rect(
+            insert=insert,
+            size=size,
+            stroke=stroke,
+            stroke_width=stroke_width,
+            fill=fill,
+        )
+
+    def _line(self, start, end, stroke="black", stroke_width=0.5):
+        return Line(start=start, end=end, stroke=stroke, stroke_width=stroke_width)
+
+    def _text(self, text, insert, font_size=4):
+        return Text(text=text, insert=insert, font_size=font_size)
+
+    def _move(self, obj, x, y):
+        obj.translate(x, y)
+        return obj
+
     def render_second(self, second_type, insert=(0, 0)):
         gr = svgwrite.container.Group()
         defaults = {"size": self.second_size, "insert": insert}
@@ -32,55 +53,39 @@ class SvgRenderer:
         x, y = insert
         h, w = self.second_size
         if second_type == SecondType.off:
-            gr.add(svgwrite.shapes.Rect(**defaults, fill="gray"))
-            gr.add(
-                svgwrite.shapes.Line(**line_defaults, start=(x + w, y), end=(x, y + h))
-            )
-            gr.add(
-                svgwrite.shapes.Line(**line_defaults, start=(x, y), end=(x + w, y + h))
-            )
+            gr.add(self._rect(**defaults, fill="gray"))
+            gr.add(self._line(**line_defaults, start=(x + w, y), end=(x, y + h)))
+            gr.add(self._line(**line_defaults, start=(x, y), end=(x + w, y + h)))
         elif second_type == SecondType.red:
-            gr.add(svgwrite.shapes.Rect(**defaults, fill="red"))
+            gr.add(self._rect(**defaults, fill="red"))
             gr.add(
-                svgwrite.shapes.Line(
+                self._line(
                     **line_defaults, start=(x, y + h / 2), end=(x + w, y + h / 2)
                 )
             )
         elif second_type == SecondType.red_yellow:
-            gr.add(svgwrite.shapes.Rect(insert=insert, size=(w, h / 2), fill="red"))
+            gr.add(self._rect(insert=insert, size=(w, h / 2), fill="red"))
+            gr.add(self._rect(insert=(x, y + h / 2), size=(w, h / 2), fill="yellow"))
             gr.add(
-                svgwrite.shapes.Rect(
-                    insert=(x, y + h / 2), size=(w, h / 2), fill="yellow"
-                )
-            )
-            gr.add(
-                svgwrite.shapes.Line(
+                self._line(
                     **line_defaults, start=(x, y + h / 2), end=(x + w, y + h / 2)
                 )
             )
         elif second_type == SecondType.green:
-            gr.add(svgwrite.shapes.Rect(**defaults, fill="green"))
+            gr.add(self._rect(**defaults, fill="green"))
         elif second_type == SecondType.yellow:
-            gr.add(svgwrite.shapes.Rect(**defaults, fill="yellow"))
+            gr.add(self._rect(**defaults, fill="yellow"))
         elif second_type == SecondType.green_blinking:
-            gr.add(svgwrite.shapes.Rect(size=(w / 2, h), insert=(x, y), fill="white"))
-            gr.add(
-                svgwrite.shapes.Rect(
-                    size=(w / 2, h), insert=(x + w / 2, y), fill="green"
-                )
-            )
+            gr.add(self._rect(size=(w / 2, h), insert=(x, y), fill="white"))
+            gr.add(self._rect(size=(w / 2, h), insert=(x + w / 2, y), fill="green"))
         elif second_type == SecondType.yellow_blinking:
-            gr.add(svgwrite.shapes.Rect(**defaults, fill="yellow"))
+            gr.add(self._rect(**defaults, fill="yellow"))
+            gr.add(self._line(**line_defaults, start=(x + w, y), end=(x, y + h)))
             gr.add(
-                svgwrite.shapes.Line(**line_defaults, start=(x + w, y), end=(x, y + h))
+                self._line(**line_defaults, start=(x + w / 2, y), end=(x, y + h / 2))
             )
             gr.add(
-                svgwrite.shapes.Line(
-                    **line_defaults, start=(x + w / 2, y), end=(x, y + h / 2)
-                )
-            )
-            gr.add(
-                svgwrite.shapes.Line(
+                self._line(
                     **line_defaults, start=(x + w, y + h / 2), end=(x + w / 2, y + h)
                 )
             )
@@ -116,7 +121,7 @@ class SvgRenderer:
                 (gr_start_i + gr_end_i) / 2 if gr_start_i < gr_end_i else gr_end_i / 2
             )
             gr_insert = (gr_insert_i * w, 9)
-            annotation = dwg.text(str(gr_len), insert=gr_insert)
+            annotation = self._text(str(gr_len), insert=gr_insert)
             g.add(annotation)
         return g
 
@@ -135,7 +140,7 @@ class SvgRenderer:
             if second and last_type != second:
                 if self.left_offset <= i <= len(group.seconds) - self.right_offset:
                     g.add(
-                        dwg.text(
+                        self._text(
                             str(i - self.left_offset), insert=(x, y + 3), font_size=4
                         )
                     )
@@ -167,17 +172,17 @@ class SvgRenderer:
     def render_group_name(self, group):
         dwg = svgwrite.Drawing()
         g = dwg.g(font_size=6)
-        g.add(dwg.text(group.name, insert=(0, 0)))
+        g.add(self._text(group.name, insert=(0, 0)))
         return g
 
     def render_group(self, group):
         dwg = svgwrite.Drawing()
         g = dwg.g()
         stripe = self.render_group_stripe(group)
-        stripe.translate(20, 0)
+        stripe = self._move(stripe, 20, 0)
         g.add(stripe)
         txt = self.render_group_name(group)
-        txt.translate(0, 9)
+        txt = self._move(txt, 0, 9)
         g.add(txt)
         return g
 
@@ -200,10 +205,10 @@ class SvgRenderer:
             ruler.add(dwg.line(stroke="black", start=(x, y), end=(x, y + 3)))
             if i % 5 == 0:
                 ruler.add(dwg.line(stroke="black", start=(x, y), end=(x, y - 4)))
-                ruler.add(dwg.text(str(i), insert=(x - 1, y - 5), font_size=4))
+                ruler.add(self._text(str(i), insert=(x - 1, y - 5), font_size=4))
             if i == length and i % 5 != 0:
                 ruler.add(dwg.line(stroke="black", start=(x, y), end=(x, y - 4)))
-                end_txt = dwg.text(str(i), insert=(x + 2, y), font_size=4)
+                end_txt = self._text(str(i), insert=(x + 2, y), font_size=4)
                 ruler.add(end_txt)
         return ruler
 
@@ -213,7 +218,7 @@ class SvgRenderer:
         g = dwg.g(font_size=h, fill="black")
         for i, txt in annotations:
             insert = ((self.left_offset + i) * w, 0)
-            text = dwg.text(txt, insert=insert)
+            text = self._text(txt, insert=insert)
             text.rotate(90, insert)
             g.add(text)
             g.add(dwg.line(stroke="black", start=(insert[0], -1), end=(insert[0], -6)))
@@ -235,16 +240,16 @@ class SvgRenderer:
         prog = dwg.g(id="program-stripes", stroke_width=0.5)
         prog.add(dwg.rect(fill="white", size=("100%", "100%"), insert=(0, 0)))
         top_ruler = self.top_ruler(max_len - self.left_offset - self.right_offset)
-        top_ruler.translate(20 + left_margin + w * self.left_offset, 10)
+        top_ruler = self._move(top_ruler, 20 + left_margin + w * self.left_offset, 10)
         prog.add(top_ruler)
         for i, group in enumerate(program.groups):
             gr = self.render_group(group)
-            gr.translate(left_margin, 15 + group_height * i)
+            gr = self._move(gr, left_margin, 15 + group_height * i)
             prog.add(gr)
         if self.annotations:
             annotations = self.render_annotations(self.annotations)
-            annotations.translate(
-                20 + left_margin, 20 + group_height * len(program.groups)
+            annotations = self._move(
+                annotations, 20 + left_margin, 20 + group_height * len(program.groups)
             )
             prog.add(annotations)
         prog.scale(scale)
