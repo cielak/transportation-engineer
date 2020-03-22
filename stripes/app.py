@@ -7,7 +7,7 @@ import dash_table as dt
 from dash.dependencies import Input, Output, State
 
 from stripes.models import ProgramStripes, SecondType
-from stripes.render import SvgRenderer
+from stripes.render import ColorTemplate, SvgRenderer
 
 
 def read_rows(rows):
@@ -65,14 +65,15 @@ def add_callbacks(app):
             else None
         )
         annotate_greens = green_lengths == ["green_lengths"]
-        renderer = SvgRenderer(
+        template = ColorTemplate(
+            SvgRenderer(),
             annotate_greens=annotate_greens,
             left_offset=left_offset,
             right_offset=right_offset,
             annotations=formatted_annotations,
         )
         return format_svg(
-            renderer.render_program(ProgramStripes.from_ranges_list(formatted_rows))
+            template.render(ProgramStripes.from_ranges_list(formatted_rows))
         )
 
 
