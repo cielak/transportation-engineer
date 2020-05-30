@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from svgwrite import Drawing
 from svgwrite.container import Group
 from svgwrite.shapes import Rect, Line
@@ -18,7 +20,21 @@ class TextTemplate:
 
 
 class SvgRenderer:
+    size_unit = "mm"
+
+    def _u(self, value):
+        if isinstance(value, Iterable):
+            return tuple("{}{}".format(x, self.size_unit) for x in value)
+        else:
+            return "{}{}".format(value, self.size_unit)
+
     class Drawing(Drawing):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.add(
+                Rect(insert=(0, 0), size=("100%", "100%"), stroke="none", fill="white")
+            )
+
         def append(self, obj):
             self.add(obj)
 
@@ -28,44 +44,43 @@ class SvgRenderer:
 
     def rect(self, insert, size, stroke="black", stroke_width=0.5, fill=None):
         return Rect(
-            insert=insert,
-            size=size,
+            insert=self._u(insert),
+            size=self._u(size),
             stroke=stroke,
-            stroke_width=stroke_width,
+            stroke_width=self._u(stroke_width),
             fill=fill,
         )
 
     def line(self, start, end, stroke="black", stroke_width=0.5):
-        return Line(start=start, end=end, stroke=stroke, stroke_width=stroke_width)
+        return Line(
+            start=self._u(start),
+            end=self._u(end),
+            stroke=stroke,
+            stroke_width=self._u(stroke_width),
+        )
 
     def text(self, text, insert, fill="black", font_size=4, font_weight="normal"):
         return Text(
             text=text,
-            insert=insert,
+            insert=self._u(insert),
             fill=fill,
-            font_size=font_size,
+            font_size=self._u(font_size),
             font_weight=font_weight,
         )
 
-    def rotated_text(
-        self, text, insert, angle=0, fill="black", font_size=4, font_weight="normal"
+    def vertical_text(
+        self, text, insert, fill="black", font_size=4, font_weight="normal"
     ):
-        g = self.Group()
+        x, y = insert
         t = self.text(
             text=text,
-            insert=(0, 0),
+            insert=(y, -x),
             fill=fill,
             font_size=font_size,
             font_weight=font_weight,
         )
-        t.translate(*insert)
-        t.rotate(angle)
-        g.append(t)
-        return g
-
-    def move(self, obj, x, y):
-        obj.translate(x, y)
-        return obj
+        t.rotate(90)
+        return t
 
 
 class ColorTemplate:
@@ -153,7 +168,7 @@ class ColorTemplate:
             raise ValueError("Unknown signal second type")
         return gr
 
-    def green_length_annotations(self, seconds):
+    def calculate_green_length_annotations(self, seconds):
         starts = []
         ends = []
         last = None
@@ -170,39 +185,44 @@ class ColorTemplate:
             greens = greens[1:-1] + [(last_start, first_end, first_len + last_len)]
         return greens
 
-    def render_green_length_annotations(self, group):
+    def render_green_length_annotations(self, group, insert=(0, 0)):
         w, h = self.second_size
         g = self.renderer.Group()
-        for gr_start_i, gr_end_i, gr_len in self.green_length_annotations(
+        for gr_start_i, gr_end_i, gr_len in self.calculate_green_length_annotations(
             group.seconds
         ):
             gr_insert_i = (
                 (gr_start_i + gr_end_i) / 2 if gr_start_i < gr_end_i else gr_end_i / 2
             )
-            gr_insert = (gr_insert_i * w, 9)
+            gr_insert = (insert[0] + gr_insert_i * w, insert[1] + 0.9 * 2 * h)
             annotation = self.renderer.text(
                 str(gr_len),
                 insert=gr_insert,
                 fill="white",
-                font_size=4,
+                font_size=4 / 5 * h,
                 font_weight="bold",
             )
             g.append(annotation)
         return g
 
-    def render_group_stripe(self, group):
+    def render_group_stripe(self, group, insert=(0, 0)):
         w, h = self.second_size
+        long_tick_interval = 5
+        short_tick_length = 3 / 5 * h
+        long_tick_length = 4 / 5 * h
         g = self.renderer.Group()
         last_type = group.seconds[-1]
         l_place = None
         for i, second in enumerate(group.seconds + [None]):
-            x, y = (w * i, 0)
+            x, y = (insert[0] + w * i, insert[1])
             if second:
-                g.append(self.render_second(second, insert=(x, y + 5)))
-            tick_delta = 4 if i % 5 else 3
+                g.append(self.render_second(second, insert=(x, y + h)))
+            tick_delta = (
+                long_tick_length if i % long_tick_interval else short_tick_length
+            )
             g.append(
                 self.renderer.line(
-                    stroke="black", start=(x, y + tick_delta), end=(x, y + 5)
+                    stroke="black", start=(x, y + tick_delta), end=(x, y + h)
                 )
             )
             if second and last_type != second:
@@ -235,30 +255,30 @@ class ColorTemplate:
             self.renderer.rect(
                 fill="none",
                 stroke="black",
-                insert=(0, 5),
-                size=(len(group.seconds) * 5, 5),
+                insert=(insert[0], insert[1] + h),
+                size=(len(group.seconds) * w, h),
             )
         )
         if self.annotate_greens:
-            g.append(self.render_green_length_annotations(group))
+            g.append(self.render_green_length_annotations(group, insert=insert))
         return g
 
-    def render_group(self, group):
+    def render_group(self, group, insert=(0, 0)):
         g = self.renderer.Group()
-        stripe = self.render_group_stripe(group)
-        stripe = self.renderer.move(stripe, 20, 0)
+        stripe = self.render_group_stripe(group, insert=(insert[0] + 20, insert[1]))
         g.append(stripe)
-        txt = self.renderer.text(group.name, insert=(0, 0), font_size=6)
-        txt = self.renderer.move(txt, 0, 9)
+        txt = self.renderer.text(
+            group.name, insert=(insert[0], insert[1] + 9), font_size=6
+        )
         g.append(txt)
         return g
 
-    def top_ruler(self, length):
+    def top_ruler(self, length, insert=(0, 0)):
         ruler = self.renderer.Group()
         sec_w, sec_h = self.second_size
         for i in range(length + 1):
-            x = i * sec_w
-            y = 0
+            x = insert[0] + i * sec_w
+            y = insert[1]
             if i < length:
                 ruler.append(
                     self.renderer.line(
@@ -286,17 +306,20 @@ class ColorTemplate:
                 ruler.append(end_txt)
         return ruler
 
-    def render_annotations(self, annotations):
+    def render_annotations(self, annotations, insert=(0, 0)):
         w, h = self.second_size
         g = self.renderer.Group()
         for i, txt in annotations:
-            x = (self.left_offset + i) * w
+            x = insert[0] + (self.left_offset + i) * w
+            y = insert[1]
             g.append(
-                self.renderer.rotated_text(
-                    txt, insert=(x, 0), font_size=h, fill="black", angle=90
+                self.renderer.vertical_text(
+                    txt, insert=(x, y), font_size=h, fill="black"
                 )
             )
-            g.append(self.renderer.line(stroke="black", start=(x, -1), end=(x, -6)))
+            g.append(
+                self.renderer.line(stroke="black", start=(x, y - 1), end=(x, y - 6))
+            )
         return g
 
     def render_program(self, program):
@@ -306,19 +329,18 @@ class ColorTemplate:
 
         max_len = max(len(g.seconds) for g in program.groups)
         prog = self.renderer.Group()
-        top_ruler = self.top_ruler(max_len - self.left_offset - self.right_offset)
-        top_ruler = self.renderer.move(
-            top_ruler, 20 + left_margin + w * self.left_offset, 10
+        top_ruler = self.top_ruler(
+            max_len - self.left_offset - self.right_offset,
+            insert=(20 + left_margin + w * self.left_offset, 10),
         )
         prog.append(top_ruler)
         for i, group in enumerate(program.groups):
-            gr = self.render_group(group)
-            gr = self.renderer.move(gr, left_margin, 15 + group_height * i)
+            gr = self.render_group(group, insert=(left_margin, 15 + group_height * i))
             prog.append(gr)
         if self.annotations:
-            annotations = self.render_annotations(self.annotations)
-            annotations = self.renderer.move(
-                annotations, 20 + left_margin, 20 + group_height * len(program.groups)
+            annotations = self.render_annotations(
+                self.annotations,
+                insert=(20 + left_margin, 20 + group_height * len(program.groups)),
             )
             prog.append(annotations)
         return prog
