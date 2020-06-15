@@ -3,6 +3,11 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
+
+from cartogram.app import (
+    add_callbacks as add_cartogram_callbacks,
+    layout as cartogram_layout,
+)
 from signalling.app.setup import (
     add_callbacks as add_signalling_callbacks,
     layout as signalling_layout,
@@ -26,6 +31,8 @@ index_layout = html.Div(
         dcc.Location(id="url", refresh=False),
         dcc.Link("Transportation Engineer", href="/"),
         html.Br(),
+        dcc.Link("cartogram", href="/cartogram"),
+        html.Br(),
         dcc.Link("signalling", href="/signalling"),
         html.Br(),
         dcc.Link("stripes", href="/stripes"),
@@ -35,6 +42,8 @@ index_layout = html.Div(
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
+    if pathname == "/cartogram":
+        return cartogram_layout
     if pathname == "/signalling":
         return signalling_layout
     elif pathname == "/stripes":
@@ -43,6 +52,7 @@ def display_page(pathname):
         return index_layout
 
 
+add_cartogram_callbacks(app)
 add_signalling_callbacks(app)
 add_stripes_callbacks(app)
 
