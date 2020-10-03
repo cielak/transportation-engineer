@@ -42,7 +42,9 @@ index_layout = html.Div(
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
-    if pathname == "/signalling":
+    if pathname == "/":
+        return index_layout
+    elif pathname == "/signalling":
         return signalling_layout
     elif pathname == "/stripes-slider":
         return stripes_slider_layout

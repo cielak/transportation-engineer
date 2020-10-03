@@ -3,7 +3,7 @@ import dash_html_components as html
 import dash_table as dt
 from dash.dependencies import Input, Output, State
 
-from stripes.app.formatters import read_rows, format_svg
+from stripes.app.formatters import format_svg, read_rows
 from stripes.models import ProgramStripes, SecondType
 from stripes.render import ColorTemplate, SvgRenderer
 

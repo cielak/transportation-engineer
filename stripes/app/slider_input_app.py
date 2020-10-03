@@ -6,6 +6,8 @@ from stripes.app.formatters import format_svg
 from stripes.models import ProgramStripes
 from stripes.render import ColorTemplate, SvgRenderer
 
+DEFAULT_CYCLE_LENGTH = 50  # seconds
+
 
 class GroupElement(html.Div):
     def __init__(self, id: str, cycle_length: int):
@@ -33,6 +35,7 @@ class GroupElement(html.Div):
                         step=1,
                         marks={i: str(i) for i in range(cycle_length)},
                         id=id + "-range",
+                        value=[1, int(cycle_length / 2)],
                     ),
                 ),
             ],
@@ -41,14 +44,26 @@ class GroupElement(html.Div):
 
 
 def add_callbacks(app):
-    pass
+    @app.callback(
+        Output("group_sliders", "children"),
+        [Input("add_group_button", "n_clicks")],
+        [State("group_sliders", "children")],
+    )
+    def add_group(n_clicks, group_elements):
+        if n_clicks:
+            group_elements.append(
+                GroupElement(f"group-{n_clicks}", DEFAULT_CYCLE_LENGTH)
+            )
+        return group_elements
 
 
 layout = html.Div(
     [
         html.H1("Stripes"),
         html.Button("Add group", id="add_group_button", n_clicks=0),
-        html.Div(GroupElement("group-0", 50), id="groups_table"),
+        html.Div(
+            children=[GroupElement("group-0", DEFAULT_CYCLE_LENGTH)], id="group_sliders"
+        ),
         html.Button("Draw program", id="draw_program_stripes_button", n_clicks=0),
         html.Div(id="stripes"),
     ]

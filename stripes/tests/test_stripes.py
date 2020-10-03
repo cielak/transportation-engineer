@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from stripes.models import GroupStripe, SecondType, ProgramStripes
+from stripes.models import GroupStripe, ProgramStripes, SecondType
 from stripes.render import ColorTemplate, SvgRenderer
 
 
