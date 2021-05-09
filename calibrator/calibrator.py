@@ -1,43 +1,19 @@
-from itertools import product
-
-import numpy as np
 from matplotlib import pyplot as plt
 from skimage import io
-from skimage.draw import circle_perimeter, random_shapes
+from skimage.draw import circle_perimeter
 from skimage.transform import PiecewiseAffineTransform, warp
 
 
 def read_image():
-    def add_crosses(image):
-        for r, c in get_image_mesh_points():
-            x_value = 1
-            x_size = 1
-            image[r, c] = x_value
-            if r < image.shape[0] - x_size:
-                image[r + x_size, c] = x_value
-            if c < image.shape[1] - x_size:
-                image[r, c + x_size] = x_value
-            if r >= x_size:
-                image[r - x_size, c] = x_value
-            if c >= x_size:
-                image[r, c - x_size] = x_value
-
-    image_shape = (100, 100)
-    img, _ = random_shapes(
-        image_shape, max_shapes=10, multichannel=False, random_seed=100
-    )
-    add_crosses(img)
-    return img
+    raise NotImplementedError
 
 
 def get_image_mesh_points():
-    coord = [0, 23, 40, 60, 81, 99]
-    return np.array([(r, c) for (r, c) in product(coord, coord)])
+    raise NotImplementedError
 
 
 def get_perfect_mesh_points():
-    coord = [0, 20, 40, 60, 80, 99]
-    return np.array([(r, c) for (r, c) in product(coord, coord)])
+    raise NotImplementedError
 
 
 def calculate_transform(reality, expectation):
@@ -76,13 +52,20 @@ def verify_result(original_image, transformed_image):
     plt.show()
 
 
+def calibrate(image, mesh_source, mesh_destination):
+    transform = calculate_transform(mesh_destination, mesh_source)
+    return apply_transform(image, transform)
+
+
 def main():
     image_data = read_image()
     image_mesh_points = get_image_mesh_points()
     perfect_mesh_points = get_perfect_mesh_points()
     confirm_mesh(image_data, perfect_mesh_points)
-    transform = calculate_transform(perfect_mesh_points, image_mesh_points)
-    verify_result(image_data, apply_transform(image_data, transform))
+    calibrated_image_data = calibrate(
+        image_data, image_mesh_points, perfect_mesh_points
+    )
+    verify_result(image_data, calibrated_image_data)
 
 
 if __name__ == "__main__":
