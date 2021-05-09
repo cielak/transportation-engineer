@@ -3,4 +3,5 @@ dash
 gunicorn
 plotly
 pytest
+scikit-image
 svgwrite

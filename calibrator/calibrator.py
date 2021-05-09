@@ -23,7 +23,9 @@ def read_image():
                 image[r, c - x_size] = x_value
 
     image_shape = (100, 100)
-    img, _ = random_shapes(image_shape, max_shapes=10, multichannel=False, random_seed=100)
+    img, _ = random_shapes(
+        image_shape, max_shapes=10, multichannel=False, random_seed=100
+    )
     add_crosses(img)
     return img
 
@@ -67,10 +69,10 @@ def confirm_mesh(image_data, perfect_mesh_points):
 def verify_result(original_image, transformed_image):
     fig, axes = plt.subplots(nrows=1, ncols=2)
     ax = axes.ravel()
-    ax[0].imshow(original_image, cmap='gray')
-    ax[0].set_title('Original image')
-    ax[1].imshow(transformed_image, cmap='gray')
-    ax[1].set_title('Transformed image')
+    ax[0].imshow(original_image, cmap="gray")
+    ax[0].set_title("Original image")
+    ax[1].imshow(transformed_image, cmap="gray")
+    ax[1].set_title("Transformed image")
     plt.show()
 
 
