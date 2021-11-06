@@ -1,6 +1,6 @@
 import pytest
 
-from stripes.models import SecondType, GroupStripe
+from stripes.models import GroupStripe, SecondType
 
 
 class TestModels:
