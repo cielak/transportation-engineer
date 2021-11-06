@@ -3,14 +3,14 @@ from collections import OrderedDict
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output, State
 import dash_table as dt
+from dash.dependencies import Input, Output, State
 
 from signalling.app import formatters, validators
 from signalling.logic import (
-    intersect_traffic_streams,
     collision_intergreen_time,
     groups_intergreen_times,
+    intersect_traffic_streams,
 )
 
 HEADER = "evac\\arr"

@@ -3,18 +3,12 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
-from signalling.app.setup import (
-    add_callbacks as add_signalling_callbacks,
-    layout as signalling_layout,
-)
-from stripes.app.string_input_app import (
-    add_callbacks as add_stripes_text_callbacks,
-    layout as stripes_text_layout,
-)
-from stripes.app.slider_input_app import (
-    add_callbacks as add_stripes_slider_callbacks,
-    layout as stripes_slider_layout,
-)
+from signalling.app.setup import add_callbacks as add_signalling_callbacks
+from signalling.app.setup import layout as signalling_layout
+from stripes.app.slider_input_app import add_callbacks as add_stripes_slider_callbacks
+from stripes.app.slider_input_app import layout as stripes_slider_layout
+from stripes.app.string_input_app import add_callbacks as add_stripes_text_callbacks
+from stripes.app.string_input_app import layout as stripes_text_layout
 
 app = dash.Dash(__name__)
 server = app.server

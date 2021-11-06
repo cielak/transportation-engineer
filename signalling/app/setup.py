@@ -1,10 +1,9 @@
 import dash
-import dash_table as dt
 import dash_html_components as html
+import dash_table as dt
 
 from signalling.app.callbacks import add_callbacks
-
-from signalling.models import TrafficStream, StreamIntersection, CollisionPoint
+from signalling.models import CollisionPoint, StreamIntersection, TrafficStream
 
 layout = html.Div(
     [
