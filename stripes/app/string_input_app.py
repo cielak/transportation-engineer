@@ -1,42 +1,11 @@
-import base64
-from collections import defaultdict
-
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table as dt
 from dash.dependencies import Input, Output, State
 
+from stripes.app.formatters import format_svg, read_rows
 from stripes.models import ProgramStripes, SecondType
 from stripes.render import ColorTemplate, SvgRenderer
-
-
-def read_rows(rows):
-    def format_row(row):
-        data = [s.strip() for s in row["group_data"].split(",")]
-        row_data = defaultdict(list)
-        for s in data:
-            sec_type, sec_range = s.split(" ")
-            row_data[sec_type].append([int(x) for x in sec_range.split("-")])
-        return [row["group_name"], row_data]
-
-    return [format_row(row) for row in rows]
-
-
-def format_svg(dwg):
-    raw_content = dwg.tostring()
-    content = str(base64.b64encode(raw_content.encode("utf-8")), "utf-8")
-    data_uri = "data:image/svg+xml;base64,{}".format(content)
-    return html.Div(
-        html.A(
-            [
-                "(click to download full size image)",
-                html.Img(src=data_uri, width="100%", height="100%"),
-            ],
-            href=data_uri,
-            target="_blank",
-            download="stripes.svg",
-        ),
-    )
 
 
 def add_callbacks(app):

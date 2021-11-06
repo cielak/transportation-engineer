@@ -1,6 +1,9 @@
+from unittest.mock import MagicMock
+
 import pytest
 
-from stripes.models import GroupStripe, SecondType
+from stripes.models import GroupStripe, ProgramStripes, SecondType
+from stripes.render import ColorTemplate, SvgRenderer
 
 
 class TestModels:
@@ -29,3 +32,38 @@ class TestModels:
             GroupStripe.from_ranges_dict(
                 "T1", {"red": [(red_start, red_stop)], "green": [(10, 20)]}
             )
+
+
+class TestRender:
+    def test_color_template(self):
+        template = ColorTemplate(
+            MagicMock(),
+            annotate_greens=True,
+            left_offset=5,
+            right_offset=5,
+            annotations=[(-2, "Faza 1"), (0, "PF 1-2"), (23, "Faza 2")],
+        )
+        formatted_rows = [
+            [
+                "K1",
+                {
+                    "off": [[0, 5]],
+                    "yellow": [[5, 10], [50, 53]],
+                    "red": [[10, 30], [53, 60]],
+                    "red_yellow": [[30, 31]],
+                    "green": [[31, 50]],
+                },
+            ],
+            [
+                "P1",
+                {
+                    "off": [[0, 5]],
+                    "yellow": [[5, 10], [50, 53]],
+                    "red": [[10, 30], [53, 60]],
+                    "red_yellow": [[30, 31]],
+                    "green": [[31, 50]],
+                },
+            ],
+        ]
+        program_stripes = ProgramStripes.from_ranges_list(formatted_rows)
+        template.render(program_stripes)
