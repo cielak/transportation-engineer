@@ -1,10 +1,10 @@
 import typing as t
 
 from signalling.models import (
-    TrafficStream,
-    StreamIntersection,
     CollisionPoint,
     SignallingGroup,
+    StreamIntersection,
+    TrafficStream,
 )
 
 

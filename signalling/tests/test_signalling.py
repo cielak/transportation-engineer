@@ -1,15 +1,15 @@
 import pytest
 
 from signalling.logic import (
-    intergreen_time,
     groups_intergreen_times,
+    intergreen_time,
     intersect_traffic_streams,
 )
 from signalling.models import (
-    TrafficStream,
-    StreamIntersection,
-    SignallingGroup,
     GroupIntergreen,
+    SignallingGroup,
+    StreamIntersection,
+    TrafficStream,
 )
 
 

@@ -1,5 +1,5 @@
-from enum import Enum
 import typing as t
+from enum import Enum
 
 
 class SecondType(Enum):

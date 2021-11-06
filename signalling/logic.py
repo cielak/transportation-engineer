@@ -3,12 +3,12 @@ from itertools import product
 from math import ceil
 
 from signalling.models import (
-    TrafficStream,
     CollisionPoint,
-    SignallingPhase,
-    SignallingGroup,
-    StreamIntersection,
     GroupIntergreen,
+    SignallingGroup,
+    SignallingPhase,
+    StreamIntersection,
+    TrafficStream,
 )
 
 

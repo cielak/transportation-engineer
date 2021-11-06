@@ -2,7 +2,7 @@ from typing import Iterable
 
 from svgwrite import Drawing
 from svgwrite.container import Group
-from svgwrite.shapes import Rect, Line
+from svgwrite.shapes import Line, Rect
 from svgwrite.text import Text
 
 from stripes.models import SecondType
