@@ -1,11 +1,10 @@
 import pytest
-from unittest.mock import patch
 
 from stripes.models import SecondType, GroupStripe
 
 
 class TestModels:
-    def test_group_stipe(self):
+    def test_group_stripe(self):
         gs = GroupStripe.from_ranges_dict(
             "K1",
             {
@@ -25,7 +24,7 @@ class TestModels:
         )
 
     @pytest.mark.parametrize("red_start, red_stop", [[0, 9], [1, 10]])
-    def test_group_stipe_invalid(self, red_start, red_stop):
+    def test_group_stripe_invalid(self, red_start, red_stop):
         with pytest.raises(ValueError):
             GroupStripe.from_ranges_dict(
                 "T1", {"red": [(red_start, red_stop)], "green": [(10, 20)]}

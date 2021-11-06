@@ -25,7 +25,18 @@ def read_rows(rows):
 def format_svg(dwg):
     raw_content = dwg.tostring()
     content = str(base64.b64encode(raw_content.encode("utf-8")), "utf-8")
-    return html.Div(html.Img(src="data:image/svg+xml;base64," + content))
+    data_uri = "data:image/svg+xml;base64,{}".format(content)
+    return html.Div(
+        html.A(
+            [
+                "(click to download full size image)",
+                html.Img(src=data_uri, width="100%", height="100%"),
+            ],
+            href=data_uri,
+            target="_blank",
+            download="stripes.svg",
+        ),
+    )
 
 
 def add_callbacks(app):
