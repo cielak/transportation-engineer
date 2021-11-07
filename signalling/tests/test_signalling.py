@@ -55,7 +55,11 @@ class TestLogic:
     def test_intergreen_time(self, evac_yellow_time, evac_time, arr_time, intergreen):
         assert intergreen_time(evac_yellow_time, evac_time, arr_time) == intergreen
 
-    @given(st.floats(), st.floats(), st.floats())
+    @given(
+        st.floats(min_value=0, allow_nan=False, allow_infinity=False),
+        st.floats(min_value=0, allow_nan=False, allow_infinity=False),
+        st.floats(min_value=0, allow_nan=False, allow_infinity=False),
+    )
     def test_intergreen_time_is_nonnegative(
         self, evac_yellow_time, evac_time, arr_time
     ):
