@@ -50,13 +50,18 @@ def read_signalling_groups(
     signalling_groups_rows, traffic_streams_rows
 ) -> t.List[SignallingGroup]:
     streams = read_traffic_streams(traffic_streams_rows)
+
+    def get_signalling_group_name(g):
+        return g["props"]["children"][1]["props"]["value"]
+
+    def get_signalling_group_streams_ids(g):
+        return g["props"]["children"][2]["props"]["value"]
+
     return [
         SignallingGroup(
-            name=g["props"]["children"][0]["props"]["value"],
+            name=get_signalling_group_name(g),
             streams=set(
-                s
-                for s in streams
-                if s.stream_id in g["props"]["children"][1]["props"]["value"]
+                s for s in streams if s.stream_id in get_signalling_group_streams_ids(g)
             ),
         )
         for g in signalling_groups_rows
