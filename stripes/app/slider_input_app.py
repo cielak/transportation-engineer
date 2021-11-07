@@ -56,6 +56,29 @@ def add_callbacks(app):
             )
         return group_elements
 
+    @app.callback(
+        Output("slider-stripes", "children"),
+        [Input("draw_program_stripes_button", "n_clicks")],
+        [State("group_sliders", "children")],
+    )
+    def render_program_stripes(n_clicks, group_elements):
+        formatted_rows = [
+            [
+                "K1",
+                {
+                    "off": [[0, 5]],
+                    "yellow": [[5, 10], [50, 53]],
+                    "red": [[10, 30], [53, 60]],
+                    "red_yellow": [[30, 31]],
+                    "green": [[31, 50]],
+                },
+            ],
+        ]
+        template = ColorTemplate(SvgRenderer())
+        return format_svg(
+            template.render(ProgramStripes.from_ranges_list(formatted_rows))
+        )
+
 
 layout = html.Div(
     [
@@ -65,6 +88,6 @@ layout = html.Div(
             children=[GroupElement("group-0", DEFAULT_CYCLE_LENGTH)], id="group_sliders"
         ),
         html.Button("Draw program", id="draw_program_stripes_button", n_clicks=0),
-        html.Div(id="stripes"),
+        html.Div(id="slider-stripes"),
     ]
 )
