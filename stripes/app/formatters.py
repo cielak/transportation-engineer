@@ -31,7 +31,7 @@ def format_svg(dwg):
         html.A(
             [
                 "(click to download full size image)",
-                html.Img(src=data_uri, width="100%", height="100%"),
+                html.Img(src=data_uri, style={"width": "110cm", "height": "32cm"}),
             ],
             href=data_uri,
             target="_blank",

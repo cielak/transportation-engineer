@@ -57,7 +57,7 @@ def add_callbacks(app):
         return group_elements
 
     @app.callback(
-        Output("slider-stripes", "children"),
+        Output("slider_stripes", "children"),
         [Input("draw_program_stripes_button", "n_clicks")],
         [State("group_sliders", "children")],
     )
@@ -108,6 +108,6 @@ layout = html.Div(
             children=[GroupElement("group-0", DEFAULT_CYCLE_LENGTH)], id="group_sliders"
         ),
         html.Button("Draw program", id="draw_program_stripes_button", n_clicks=0),
-        html.Div(id="slider-stripes"),
+        html.Div(id="slider_stripes"),
     ]
 )
