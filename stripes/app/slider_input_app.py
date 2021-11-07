@@ -50,7 +50,7 @@ def add_callbacks(app):
         [State("group_sliders", "children")],
     )
     def add_group(n_clicks, group_elements):
-        if n_clicks:
+        if n_clicks > 0:
             group_elements.append(
                 GroupElement(f"group-{n_clicks}", DEFAULT_CYCLE_LENGTH)
             )
@@ -62,18 +62,38 @@ def add_callbacks(app):
         [State("group_sliders", "children")],
     )
     def render_program_stripes(n_clicks, group_elements):
-        formatted_rows = [
-            [
-                "K1",
-                {
-                    "off": [[0, 5]],
-                    "yellow": [[5, 10], [50, 53]],
-                    "red": [[10, 30], [53, 60]],
-                    "red_yellow": [[30, 31]],
-                    "green": [[31, 50]],
-                },
-            ],
-        ]
+        # TODO: render on slider drag (with sliders 'drag_value')
+        formatted_rows = []
+        if n_clicks > 0:
+            for signalling_group_input in group_elements:
+                group_id = signalling_group_input["props"]["id"]
+                group_name = signalling_group_input["props"]["children"][0]["props"][
+                    "value"
+                ]
+                group_type = signalling_group_input["props"]["children"][1]["props"][
+                    "value"
+                ]
+                group_green_inverted = bool(
+                    signalling_group_input["props"]["children"][1]["props"]["value"]
+                )
+                group_slider_positions = signalling_group_input["props"]["children"][3][
+                    "props"
+                ]["children"]["props"]["value"]
+
+                formatted_rows.append(
+                    [
+                        group_name,
+                        {
+                            "red": [
+                                [0, group_slider_positions[0]],
+                                [group_slider_positions[1], DEFAULT_CYCLE_LENGTH],
+                            ],
+                            "green": [
+                                [group_slider_positions[0], group_slider_positions[1]]
+                            ],
+                        },
+                    ]
+                )
         template = ColorTemplate(SvgRenderer())
         return format_svg(
             template.render(ProgramStripes.from_ranges_list(formatted_rows))
