@@ -1,4 +1,5 @@
 import typing as t
+from decimal import Decimal
 from itertools import product
 from math import ceil
 
@@ -13,7 +14,7 @@ from signalling.models import (
 
 
 def intergreen_time(
-    evacuating_yellow_time: int, evacuation_time: float, arrival_time: float
+    evacuating_yellow_time: int, evacuation_time: Decimal, arrival_time: Decimal
 ) -> int:
     raw_intergreen_time = evacuating_yellow_time + evacuation_time - arrival_time
     return ceil(raw_intergreen_time) if raw_intergreen_time > 0 else 0
