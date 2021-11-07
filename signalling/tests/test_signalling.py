@@ -1,4 +1,6 @@
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 from signalling.logic import (
     groups_intergreen_times,
@@ -52,6 +54,12 @@ class TestLogic:
     )
     def test_intergreen_time(self, evac_yellow_time, evac_time, arr_time, intergreen):
         assert intergreen_time(evac_yellow_time, evac_time, arr_time) == intergreen
+
+    @given(st.floats(), st.floats(), st.floats())
+    def test_intergreen_time_is_nonnegative(
+        self, evac_yellow_time, evac_time, arr_time
+    ):
+        assert intergreen_time(evac_yellow_time, evac_time, arr_time) >= 0
 
     def test_groups_intergreen_times(self, groups, stream_intersections):
         collision_points = intersect_traffic_streams(stream_intersections)

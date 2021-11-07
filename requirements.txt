@@ -1,6 +1,7 @@
 black
 dash
 gunicorn
+hypothesis
 plotly
 pytest
 svgwrite
