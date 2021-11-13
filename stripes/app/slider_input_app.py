@@ -109,7 +109,7 @@ def add_callbacks(app):
                             [group_slider_positions[0], group_slider_positions[1]]
                         ],
                     }
-                    if group_start_on_green
+                    if not group_start_on_green
                     else {
                         "green": [
                             [0, group_slider_positions[0]],
