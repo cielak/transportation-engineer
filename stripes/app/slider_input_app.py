@@ -13,6 +13,7 @@ class GroupElement(html.Div):
     def __init__(self, id: str, cycle_length: int):
         super(GroupElement, self).__init__(
             [
+                # TODO: "Group name",
                 dcc.Input(id=f"{id}-name", value=id),
                 dcc.Dropdown(
                     id=f"{id}-type",
@@ -64,22 +65,42 @@ def add_callbacks(app):
 
     @app.callback(
         Output("group_sliders", "children"),
-        [Input("add_group_button", "n_clicks")],
+        [
+            Input("add_group_button", "n_clicks"),
+            Input("cycle_length", "value"),
+        ],
         [State("group_sliders", "children")],
     )
-    def add_group(n_clicks, group_elements):
-        if n_clicks > 0:
-            group_elements.append(
-                GroupElement(f"group-{n_clicks}", DEFAULT_CYCLE_LENGTH)
-            )
-        return group_elements
+    def update_group_elements(add_group_n_clicks, cycle_length, group_elements):
+        def add_group(group_elements, id_number):
+            group_elements.append(GroupElement(f"group-{id_number}", cycle_length))
+            return group_elements
+
+        def set_cycle_length(group_elements, cycle_length):
+            def set_slider_length(slider, max):
+                slider["props"]["max"] = max
+                slider["props"]["marks"] = {i: str(i) for i in range(cycle_length)}
+
+            sliders = [
+                element["props"]["children"][3]["props"]["children"]
+                for element in group_elements
+            ]
+            for slider in sliders:
+                set_slider_length(slider, cycle_length)
+            return group_elements
+
+        if add_group_n_clicks > 0:
+            return add_group(group_elements, id_number=add_group_n_clicks)
+        else:
+            return set_cycle_length(group_elements, int(cycle_length))
 
     @app.callback(
         Output("slider_stripes", "children"),
         [Input("draw_program_stripes_button", "n_clicks")],
-        [State("group_sliders", "children")],
+        [State("group_sliders", "children"), State("cycle_length", "value")],
     )
-    def render_program_stripes(n_clicks, group_elements):
+    def render_program_stripes(n_clicks, group_elements, cycle_length):
+        cycle_length = int(cycle_length)
         # TODO: render on slider drag (with sliders 'drag_value')
         formatted_rows = []
         for signalling_group_input in group_elements:
@@ -103,7 +124,7 @@ def add_callbacks(app):
                     {
                         "red": [
                             [0, group_slider_positions[0]],
-                            [group_slider_positions[1], DEFAULT_CYCLE_LENGTH],
+                            [group_slider_positions[1], cycle_length],
                         ],
                         "green": [
                             [group_slider_positions[0], group_slider_positions[1]]
@@ -113,7 +134,7 @@ def add_callbacks(app):
                     else {
                         "green": [
                             [0, group_slider_positions[0]],
-                            [group_slider_positions[1], DEFAULT_CYCLE_LENGTH],
+                            [group_slider_positions[1], cycle_length],
                         ],
                         "red": [[group_slider_positions[0], group_slider_positions[1]]],
                     },
@@ -128,6 +149,11 @@ def add_callbacks(app):
 layout = html.Div(
     [
         html.H1("Stripes"),
+        "Program cycle length [s]",
+        dcc.Input(
+            id="cycle_length", value=DEFAULT_CYCLE_LENGTH, type="number", min=8, step=1
+        ),
+        html.Div(),
         html.Button("Add group", id="add_group_button", n_clicks=0),
         html.Div(
             children=[GroupElement("group-0", DEFAULT_CYCLE_LENGTH)], id="group_sliders"
