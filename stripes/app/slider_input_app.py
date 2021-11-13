@@ -91,7 +91,7 @@ def add_callbacks(app):
                 "value"
             ]
             group_start_on_green = bool(
-                signalling_group_input["props"]["children"][1]["props"]["value"]
+                signalling_group_input["props"]["children"][2]["props"]["value"]
             )
             group_slider_positions = signalling_group_input["props"]["children"][3][
                 "props"
