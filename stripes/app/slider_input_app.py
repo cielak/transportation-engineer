@@ -1,3 +1,4 @@
+import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
@@ -89,10 +90,13 @@ def add_callbacks(app):
                 set_slider_length(slider, cycle_length)
             return group_elements
 
-        if add_group_n_clicks > 0:
+        triggered_input = dash.callback_context.triggered[0]["prop_id"]
+        if triggered_input == "add_group_button.n_clicks" and add_group_n_clicks > 0:
             return add_group(group_elements, id_number=add_group_n_clicks)
-        else:
+        elif triggered_input == "cycle_length.value":
             return set_cycle_length(group_elements, int(cycle_length))
+        else:
+            return group_elements
 
     @app.callback(
         Output("slider_stripes", "children"),
