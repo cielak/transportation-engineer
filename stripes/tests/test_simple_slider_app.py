@@ -99,7 +99,6 @@ def test_program_has_50_seconds_by_default():
     assert DEFAULT_CYCLE_LENGTH == 50
 
 
-@pytest.skip(reason="Still trying to figure out why this does not work")
 def test_group_element_layout(dafault_first_group_id, default_group_element):
     group_element = GroupElement(dafault_first_group_id, DEFAULT_CYCLE_LENGTH)
-    assert group_element == default_group_element
+    assert str(group_element) == str(default_group_element)
