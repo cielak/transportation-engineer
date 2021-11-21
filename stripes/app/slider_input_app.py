@@ -106,7 +106,7 @@ def add_callbacks(app):
     def render_program_stripes(n_clicks, group_elements, cycle_length):
         cycle_length = int(cycle_length)
         # TODO: render on slider drag (with sliders 'drag_value')
-        formatted_rows = []
+        program_group_signal_ranges = []
         for signalling_group_input in group_elements:
             group_id = signalling_group_input["props"]["id"]
             group_name = signalling_group_input["props"]["children"][0]["props"][
@@ -122,7 +122,7 @@ def add_callbacks(app):
                 "props"
             ]["children"]["props"]["value"]
 
-            formatted_rows.append(
+            program_group_signal_ranges.append(
                 [
                     group_name,
                     {
@@ -146,7 +146,9 @@ def add_callbacks(app):
             )
         template = ColorTemplate(SvgRenderer())
         return format_svg(
-            template.render(ProgramStripes.from_ranges_list(formatted_rows))
+            template.render(
+                ProgramStripes.from_ranges_list(program_group_signal_ranges)
+            )
         )
 
 
