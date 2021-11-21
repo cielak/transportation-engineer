@@ -10,6 +10,29 @@ from stripes.render import ColorTemplate, SvgRenderer
 DEFAULT_CYCLE_LENGTH = 50  # seconds
 
 
+def generate_program_group_range(
+    cycle_length, group_name, group_start_on_green, group_slider_positions
+):
+    return [
+        group_name,
+        {
+            "red": [
+                [0, group_slider_positions[0]],
+                [group_slider_positions[1], cycle_length],
+            ],
+            "green": [[group_slider_positions[0], group_slider_positions[1]]],
+        }
+        if not group_start_on_green
+        else {
+            "green": [
+                [0, group_slider_positions[0]],
+                [group_slider_positions[1], cycle_length],
+            ],
+            "red": [[group_slider_positions[0], group_slider_positions[1]]],
+        },
+    ]
+
+
 class GroupElement(html.Div):
     def __init__(self, id: str, cycle_length: int):
         super(GroupElement, self).__init__(
@@ -123,26 +146,12 @@ def add_callbacks(app):
             ]["children"]["props"]["value"]
 
             program_group_signal_ranges.append(
-                [
+                generate_program_group_range(
+                    cycle_length,
                     group_name,
-                    {
-                        "red": [
-                            [0, group_slider_positions[0]],
-                            [group_slider_positions[1], cycle_length],
-                        ],
-                        "green": [
-                            [group_slider_positions[0], group_slider_positions[1]]
-                        ],
-                    }
-                    if not group_start_on_green
-                    else {
-                        "green": [
-                            [0, group_slider_positions[0]],
-                            [group_slider_positions[1], cycle_length],
-                        ],
-                        "red": [[group_slider_positions[0], group_slider_positions[1]]],
-                    },
-                ]
+                    group_start_on_green,
+                    group_slider_positions,
+                )
             )
         template = ColorTemplate(SvgRenderer())
         return format_svg(
