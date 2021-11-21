@@ -10,7 +10,7 @@ from stripes.render import ColorTemplate, SvgRenderer
 DEFAULT_CYCLE_LENGTH = 50  # seconds
 
 
-def generate_program_group_range(
+def generate_single_group_program_ranges(
     cycle_length, group_name, group_start_on_green, group_slider_positions
 ):
     return [
@@ -146,7 +146,7 @@ def add_callbacks(app):
             ]["children"]["props"]["value"]
 
             program_group_signal_ranges.append(
-                generate_program_group_range(
+                generate_single_group_program_ranges(
                     cycle_length,
                     group_name,
                     group_start_on_green,
