@@ -131,7 +131,6 @@ def add_callbacks(app):
         # TODO: render on slider drag (with sliders 'drag_value')
         program_group_signal_ranges = []
         for signalling_group_input in group_elements:
-            group_id = signalling_group_input["props"]["id"]
             group_name = signalling_group_input["props"]["children"][0]["props"][
                 "value"
             ]
