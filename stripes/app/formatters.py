@@ -1,7 +1,7 @@
 import base64
 from collections import defaultdict
 
-import dash_html_components as html
+from dash import html
 
 
 def read_rows(rows):
