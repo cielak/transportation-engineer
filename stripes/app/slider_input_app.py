@@ -10,6 +10,19 @@ from stripes.render import ColorTemplate, SvgRenderer
 DEFAULT_CYCLE_LENGTH = 50  # seconds
 
 
+def read_single_group(signalling_group_input):
+    group_name = signalling_group_input["props"]["children"][0]["props"]["value"]
+    group_type = signalling_group_input["props"]["children"][1]["props"]["value"]
+    group_start_on_green = bool(
+        signalling_group_input["props"]["children"][2]["props"]["value"]
+    )
+    group_slider_positions = signalling_group_input["props"]["children"][3]["props"][
+        "children"
+    ]["props"]["value"]
+
+    return group_name, group_type, group_start_on_green, group_slider_positions
+
+
 def generate_single_group_program_ranges(
     cycle_length, group_name, group_type, group_start_on_green, group_slider_positions
 ):
@@ -131,19 +144,12 @@ def add_callbacks(app):
         # TODO: render on slider drag (with sliders 'drag_value')
         program_group_signal_ranges = []
         for signalling_group_input in group_elements:
-            group_name = signalling_group_input["props"]["children"][0]["props"][
-                "value"
-            ]
-            group_type = signalling_group_input["props"]["children"][1]["props"][
-                "value"
-            ]
-            group_start_on_green = bool(
-                signalling_group_input["props"]["children"][2]["props"]["value"]
-            )
-            group_slider_positions = signalling_group_input["props"]["children"][3][
-                "props"
-            ]["children"]["props"]["value"]
-
+            (
+                group_name,
+                group_type,
+                group_start_on_green,
+                group_slider_positions,
+            ) = read_single_group(signalling_group_input)
             program_group_signal_ranges.append(
                 generate_single_group_program_ranges(
                     cycle_length,
