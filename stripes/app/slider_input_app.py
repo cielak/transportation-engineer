@@ -10,14 +10,11 @@ DEFAULT_CYCLE_LENGTH = 50  # seconds
 
 
 def read_single_group(signalling_group_input):
-    group_name = signalling_group_input["props"]["children"][0]["props"]["value"]
-    group_type = signalling_group_input["props"]["children"][1]["props"]["value"]
-    group_start_on_green = bool(
-        signalling_group_input["props"]["children"][2]["props"]["value"]
-    )
-    group_slider_positions = signalling_group_input["props"]["children"][3]["props"][
-        "children"
-    ]["props"]["value"]
+    group_components = signalling_group_input["props"]["children"]
+    group_name = group_components[0]["props"]["value"]
+    group_type = group_components[1]["props"]["value"]
+    group_start_on_green = bool(group_components[2]["props"]["value"])
+    group_slider_positions = group_components[3]["props"]["children"]["props"]["value"]
 
     return group_name, group_type, group_start_on_green, group_slider_positions
 
