@@ -11,7 +11,7 @@ DEFAULT_CYCLE_LENGTH = 50  # seconds
 
 
 def generate_single_group_program_ranges(
-    cycle_length, group_name, group_start_on_green, group_slider_positions
+    cycle_length, group_name, group_type, group_start_on_green, group_slider_positions
 ):
     return [
         group_name,
@@ -149,6 +149,7 @@ def add_callbacks(app):
                 generate_single_group_program_ranges(
                     cycle_length,
                     group_name,
+                    group_type,
                     group_start_on_green,
                     group_slider_positions,
                 )
