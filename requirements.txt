@@ -3,5 +3,7 @@ dash
 gunicorn
 hypothesis
 plotly
+pre-commit
 pytest
+pytest-cov
 svgwrite
