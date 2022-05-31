@@ -1,9 +1,8 @@
 from collections import OrderedDict
 
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
-import dash_table as dt
+from dash import dash_table as dt
+from dash import dcc, html
 from dash.dependencies import Input, Output, State
 
 from signalling.app import formatters, validators
