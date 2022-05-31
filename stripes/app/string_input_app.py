@@ -1,6 +1,5 @@
-from dash import dcc
-from dash import html
 from dash import dash_table as dt
+from dash import dcc, html
 from dash.dependencies import Input, Output, State
 
 from stripes.app.formatters import format_svg, read_rows
