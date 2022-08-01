@@ -33,7 +33,7 @@ class GroupElement(html.Div):
                         min=0,
                         max=cycle_length,
                         step=1,
-                        marks={i: str(i) for i in range(cycle_length)},
+                        marks={i: str(i) for i in range(cycle_length + 1)},
                         id=id + "-range",
                         value=[1, int(cycle_length / 2)],
                         className="default-signalling-slider",
