@@ -14,7 +14,7 @@ def dafault_first_group_id():
 
 
 @pytest.fixture
-def default_group_element() -> dict:
+def default_group_element():
     return html.Div(
         children=[
             dcc.Input(id="group-0-name", value="group-0"),
@@ -102,3 +102,17 @@ def test_program_has_50_seconds_by_default():
 def test_group_element_layout(dafault_first_group_id, default_group_element):
     group_element = GroupElement(dafault_first_group_id, DEFAULT_CYCLE_LENGTH)
     assert str(group_element) == str(default_group_element)
+
+
+def test_read_single_group_has_correct_layout_positions_assigned(default_group_element):
+    signalling_group_input = default_group_element.to_plotly_json()
+    (
+        group_name,
+        group_type,
+        group_start_on_green,
+        group_slider_positions,
+    ) = read_single_group(signalling_group_input)
+    assert group_name == "K1"
+    assert group_type == "K"
+    assert group_start_on_green is False
+    assert group_slider_positions == [1, 25]
