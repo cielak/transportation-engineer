@@ -35,7 +35,8 @@ index_layout = html.Div(
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
-    default = index_layout
+    # default = index_layout  # TODO: Restore index page as default
+    default = stripes_slider_layout
     if pathname == "/":
         return default
     elif pathname == "/signalling":
